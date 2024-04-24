@@ -7,15 +7,68 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="startScroll"
+            android:textAllCaps="false" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_force_finished"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="forceFinished"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+
+
+    <com.dafay.imageview.TestScrollerFrameLayout
+        android:id="@+id/fl_scroller_test"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:background="#20ff00ff">
+
+        <View
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:background="#906a6da9" />
+
+    </com.dafay.imageview.TestScrollerFrameLayout>
+
+    <com.dafay.imageview.ShowScrollerView
+        android:id="@+id/ssv_scroller"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:background="#20ff00ff"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp" />
 
     <com.dafay.imageview.CustomScrollView
         android:id="@+id/sv_scrollview"
         android:layout_width="match_parent"
-        android:background="#30ff00ff"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="30dp"
+        android:background="#30ff00ff">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="《登鹳雀楼》 - 王之涣 白日依山尽，黄河入海流。欲穷千里目，更上一层楼。\n
+《登鹳雀楼》 - 王之涣 白日依山尽，黄河入海流。欲穷千里目，更上一层楼。\n
+《登鹳雀楼》 - 王之涣 白日依山尽，黄河入海流。欲穷千里目，更上一层楼。\n
+《登鹳雀楼》 - 王之涣 白日依山尽，黄河入海流。欲穷千里目，更上一层楼。\n
+《登鹳雀楼》 - 王之涣 白日依山尽，黄河入海流。欲穷千里目，更上一层楼。\n" />
+
+    </com.dafay.imageview.CustomScrollView>
 
 </LinearLayout>

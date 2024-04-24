@@ -1,21 +1,23 @@
 package com.dafay.imageview
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import by.kirich1409.viewbindingdelegate.viewBinding
+import com.dafay.demo.lib.base.ui.base.BaseActivity
+import com.dafay.imageview.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity(R.layout.activity_main) {
 
-    private var customScrollView: CustomScrollView? = null
+    override val binding: ActivityMainBinding by viewBinding()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        customScrollView = findViewById(R.id.sv_scrollview)
-
-        
-
-        // 在某个事件触发时进行平滑滚动
-        customScrollView?.smoothScrollTo(0, 500); // 滚动到Y轴500的位置
+    override fun bindListener() {
+        super.bindListener()
+        binding.btnStart.setOnClickListener {
+            binding.flScrollerTest.startScroll(300, 300, 4000)
+            binding.ssvScroller.startScroll(300, 300, 4000)
+        }
+        binding.btnForceFinished.setOnClickListener {
+            binding.flScrollerTest.forceFinished(true)
+            binding.ssvScroller.forceFinished(true)
+        }
     }
+
 }
