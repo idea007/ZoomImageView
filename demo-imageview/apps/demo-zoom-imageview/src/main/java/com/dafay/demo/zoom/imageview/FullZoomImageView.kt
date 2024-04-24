@@ -42,7 +42,6 @@ class FullZoomImageView @JvmOverloads constructor(context: Context, attr: Attrib
     private val displayRect = RectF()
     private val matrixValues = FloatArray(9)
 
-
     private var top = 0
     private var right = 0
     private var bottom = 0

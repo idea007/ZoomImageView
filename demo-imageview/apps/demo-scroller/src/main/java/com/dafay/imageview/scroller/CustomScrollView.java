@@ -1,4 +1,4 @@
-package com.dafay.imageview;
+package com.dafay.imageview.scroller;
 
 import android.content.Context;
 import android.util.AttributeSet;
