@@ -1,11 +1,15 @@
 package com.dafay.demo.zoom.imageview
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
+import by.kirich1409.viewbindingdelegate.viewBinding
+import com.dafay.demo.lib.base.ui.base.BaseActivity
+import com.dafay.demo.zoom.imageview.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+class MainActivity : BaseActivity(R.layout.activity_main) {
+    override val binding: ActivityMainBinding by viewBinding()
+
+    override fun initViews() {
+        super.initViews()
+        binding.zivImageview.setImageResource(R.mipmap.cover_01)
     }
+
 }

@@ -6,9 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.dafay.demo.zoom.imageview.ZoomImageView1
-        android:id="@+id/ziv_imageview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+    <com.dafay.demo.gesture.detector.CustomView
+        android:id="@+id/cv_custom"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:background="#30ff00ff" />
 
 </FrameLayout>
