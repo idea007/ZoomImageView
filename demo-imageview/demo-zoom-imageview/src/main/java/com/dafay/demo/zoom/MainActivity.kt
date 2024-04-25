@@ -7,13 +7,14 @@ import com.dafay.demo.lib.base.ui.base.BaseActivity
 import com.dafay.demo.lib.base.utils.dp2px
 import com.dafay.demo.zoom.R
 import com.dafay.demo.zoom.databinding.ActivityMainBinding
+import com.dafay.demo.zoom.scroller.TestScrollerViewFragment
 import com.example.demo.biz.base.widgets.GridMarginDecoration
 
 class MainActivity : BaseActivity(R.layout.activity_main) {
     override val binding: ActivityMainBinding by viewBinding()
 
     private val homeItemList = ArrayList<HomeItem>().apply {
-        this.add(HomeItem("测试 Scroller"))
+        this.add(HomeItem("测试 Scroller", TestScrollerViewFragment::class.java))
         this.add(HomeItem("测试 Scroller 运动轨迹"))
 
     }

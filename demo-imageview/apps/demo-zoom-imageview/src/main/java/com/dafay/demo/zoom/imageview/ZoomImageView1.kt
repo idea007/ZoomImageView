@@ -17,9 +17,20 @@ import android.view.ViewTreeObserver
 import android.widget.OverScroller
 import androidx.appcompat.widget.AppCompatImageView
 import com.dafay.demo.lib.base.utils.ScreenUtils
+import com.dafay.demo.lib.base.utils.debug
 
+/**
+ * 实现思路：
+ * 1. 先初始化， imageView 要设置成  super.setScaleType(ScaleType.MATRIX)
+ *  图片尺寸与 view 尺寸映射得到 baseMatrix
+ *
+ * 2. 点击缩放
+ *
+ * 3.
+ */
 
-class ZoomImageView1 @JvmOverloads constructor(context: Context, attr: AttributeSet? = null, defStyle: Int = 0) : AppCompatImageView(context, attr, defStyle), View.OnTouchListener, ViewTreeObserver.OnGlobalLayoutListener {
+class ZoomImageView1 @JvmOverloads constructor(context: Context, attr: AttributeSet? = null, defStyle: Int = 0) :
+    AppCompatImageView(context, attr, defStyle), View.OnTouchListener, ViewTreeObserver.OnGlobalLayoutListener {
 
     private var minScale = DEFAULT_MIN_SCALE
     private var midScale = DEFAULT_MID_SCALE
@@ -38,7 +49,6 @@ class ZoomImageView1 @JvmOverloads constructor(context: Context, attr: Attribute
 
     // 各种操作计算时的矩阵
     private val suppMatrix = Matrix()
-    private val displayRect = RectF()
     private val matrixValues = FloatArray(9)
 
     private var top = 0
@@ -57,13 +67,13 @@ class ZoomImageView1 @JvmOverloads constructor(context: Context, attr: Attribute
          * @return float - current scale value
          */
         get() {
-            suppMatrix.getValues(matrixValues)
-            return matrixValues[Matrix.MSCALE_X]
+            return suppMatrix.scaleX()
         }
 
     protected val displayMatrix: Matrix
         protected get() {
             drawMatrix.set(baseMatrix)
+            // 即当前 Matrix 会乘以传入的 Matrix。
             drawMatrix.postConcat(suppMatrix)
             return drawMatrix
         }
@@ -79,10 +89,10 @@ class ZoomImageView1 @JvmOverloads constructor(context: Context, attr: Attribute
         setIsZoomEnabled(true)
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val newHeight: Int = ScreenUtils.getFullScreenHeight()
-        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(newHeight, MeasureSpec.EXACTLY))
-    }
+//    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+//        val newHeight: Int = ScreenUtils.getFullScreenHeight()
+//        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(newHeight, MeasureSpec.EXACTLY))
+//    }
 
     /**
      * Gets the Display Rectangle of the currently displayed Drawable. The
@@ -386,9 +396,12 @@ class ZoomImageView1 @JvmOverloads constructor(context: Context, attr: Attribute
     private fun getDisplayRect(matrix: Matrix): RectF? {
         val d = drawable
         if (null != d) {
-            displayRect[0f, 0f, d.intrinsicWidth.toFloat()] = d.intrinsicHeight.toFloat()
-            matrix.mapRect(displayRect)
-            return displayRect
+            val tempRect=RectF()
+            tempRect[0f, 0f, d.intrinsicWidth.toFloat()] = d.intrinsicHeight.toFloat()
+            debug("getDisplayRect tempRect=${tempRect}")
+            matrix.mapRect(tempRect)
+            debug("getDisplayRect tempRect=${tempRect}")
+            return tempRect
         }
         return null
     }
@@ -397,7 +410,7 @@ class ZoomImageView1 @JvmOverloads constructor(context: Context, attr: Attribute
      * Resets the Matrix back to FIT_CENTER, and then displays it.s
      */
     private fun resetMatrix() {
-        if(suppMatrix!=null){
+        if (suppMatrix != null) {
             suppMatrix.reset()
             imageMatrix = displayMatrix
             checkMatrixBounds()
@@ -412,6 +425,9 @@ class ZoomImageView1 @JvmOverloads constructor(context: Context, attr: Attribute
      */
     private fun updateBaseMatrix(d: Drawable?) {
         if (null == d) {
+            return
+        }
+        if (width <= 0) {
             return
         }
         val viewWidth = width.toFloat()
@@ -683,7 +699,11 @@ class ZoomImageView1 @JvmOverloads constructor(context: Context, attr: Attribute
 
                             // If the velocity is greater than minVelocity perform
                             // a fling
-                            if (Math.max(Math.abs(vX), Math.abs(vY)) >= scaledMinimumFlingVelocity && drawable != null) {
+                            if (Math.max(
+                                    Math.abs(vX),
+                                    Math.abs(vY)
+                                ) >= scaledMinimumFlingVelocity && drawable != null
+                            ) {
                                 currentFlingRunnable = FlingRunnable(context)
                                 currentFlingRunnable!!.fling(width, height, -vX.toInt(), -vY.toInt())
                                 post(currentFlingRunnable)
@@ -765,8 +785,8 @@ class ZoomImageView1 @JvmOverloads constructor(context: Context, attr: Attribute
         private val EDGE_LEFT = 0
         private val EDGE_RIGHT = 1
         private val EDGE_BOTH = 2
-        val DEFAULT_MAX_SCALE = 3.0f
-        val DEFAULT_MID_SCALE = 1.75f
+        val DEFAULT_MAX_SCALE = 5.0f
+        val DEFAULT_MID_SCALE = 2f
         val DEFAULT_MIN_SCALE = 1f
 
 
