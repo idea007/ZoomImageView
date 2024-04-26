@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".home.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="startScroll"
+            android:textAllCaps="false" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_force_finished"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="forceFinished"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+
+
+    <com.dafay.demo.zoom.scroller.TestScrollerFrameLayout
+        android:id="@+id/fl_scroller_test"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:background="#20ff00ff">
+
+        <View
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:background="#906a6da9" />
+
+    </com.dafay.demo.zoom.scroller.TestScrollerFrameLayout>
+
+    <com.dafay.demo.zoom.scroller.TestScrollerView
+        android:id="@+id/ssv_scroller"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:background="#20ff00ff"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp" />
+
+
+</LinearLayout>

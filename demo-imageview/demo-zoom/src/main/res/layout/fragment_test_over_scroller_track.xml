@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,11 +24,19 @@
             android:text="forceFinished"
             android:textAllCaps="false" />
 
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_fling"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="fling"
+            android:textAllCaps="false" />
+
     </LinearLayout>
 
 
-    <com.dafay.demo.zoom.scroller.TestScrollerFrameLayout
-        android:id="@+id/fl_scroller_test"
+    <FrameLayout
+        android:id="@+id/fl_content"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_gravity="center_horizontal"
@@ -38,20 +44,12 @@
         android:background="#20ff00ff">
 
         <View
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:id="@+id/v_target"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_gravity="center"
             android:background="#906a6da9" />
-
-    </com.dafay.demo.zoom.scroller.TestScrollerFrameLayout>
-
-    <com.dafay.demo.zoom.scroller.ShowScrollerView
-        android:id="@+id/ssv_scroller"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:background="#20ff00ff"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp" />
+    </FrameLayout>
 
 
 </LinearLayout>

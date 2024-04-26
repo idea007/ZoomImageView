@@ -10,7 +10,7 @@ import android.view.View
 import android.widget.Scroller
 import com.dafay.demo.lib.base.utils.debug
 
-class ShowScrollerView @kotlin.jvm.JvmOverloads constructor(
+class TestScrollerView @kotlin.jvm.JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
