@@ -8,6 +8,7 @@ import com.dafay.demo.lib.base.utils.dp2px
 import com.dafay.demo.zoom.R
 import com.dafay.demo.zoom.databinding.ActivityMainBinding
 import com.dafay.demo.zoom.host.HostActivity
+import com.dafay.demo.zoom.interpolator.InterpolatorFragment
 import com.dafay.demo.zoom.overscroller.OverScrollerTrackFragment
 import com.dafay.demo.zoom.overscroller.TestOverScrollerViewFragment
 import com.dafay.demo.zoom.scroller.ScrollerTrackFragment
@@ -18,6 +19,7 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
     override val binding: ActivityMainBinding by viewBinding()
 
     private val homeItemList = ArrayList<HomeItem>().apply {
+        this.add(HomeItem("Interpolator 速率图", InterpolatorFragment::class.java))
         this.add(HomeItem("Scroller 示例", TestScrollerViewFragment::class.java))
         this.add(HomeItem("Scroller 运动轨迹", ScrollerTrackFragment::class.java))
 
