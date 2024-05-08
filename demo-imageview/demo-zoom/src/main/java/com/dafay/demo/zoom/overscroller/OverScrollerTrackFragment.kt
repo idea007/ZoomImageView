@@ -1,6 +1,7 @@
 package com.dafay.demo.zoom.overscroller
 
 import android.view.Choreographer
+import android.view.animation.AnimationUtils
 import android.widget.OverScroller
 import android.widget.Scroller
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -17,28 +18,39 @@ class OverScrollerTrackFragment : BaseFragment(R.layout.fragment_test_over_scrol
 
     override fun initViews() {
         overScroller = OverScroller(requireContext())
+        initTestButtons()
     }
 
-    override fun bindListener() {
-        super.bindListener()
+    private fun initTestButtons() {
+        binding.cvBtnContainer.addButton("startScroll", {
+            overScroller.startScroll(0, 0, 300, 300, 1000)
+            startAnim()
+        })
 
-        binding.btnStart.setOnClickListener {
-            overScroller.startScroll(0, 0, 300, 300, 5000)
-            postNextFrame()
-        }
-
-        binding.btnForceFinished.setOnClickListener {
+        binding.cvBtnContainer.addButton("forceFinished", {
             overScroller.forceFinished(true)
-        }
+        })
 
-        binding.btnFling.setOnClickListener {
-            overScroller.fling(0, 0, 1000, 1000, 0, 80, 0, 80,200,200)
-            postNextFrame()
-        }
+        binding.cvBtnContainer.addButton("fling", {
+            overScroller.fling(0, 0, 1000, 1000, 0, 80, 0, 80, 200, 200)
+            startAnim()
+        })
     }
 
+    /**
+     * 开启动画
+     */
+    private fun startAnim() {
+        startTime = AnimationUtils.currentAnimationTimeMillis()
+        binding.rgvRate.clearTrack()
+        postNextFrame()
+    }
+
+    // 动画开启的时间
+    private var startTime: Long = 0
     val choreographer = Choreographer.getInstance()
     private fun postNextFrame() {
+        val timePassed: Int = (AnimationUtils.currentAnimationTimeMillis() - startTime).toInt()
         val computeScrollOffsetResult = overScroller.computeScrollOffset()
         val currX = overScroller.currX
         val currY = overScroller.currY
@@ -48,12 +60,12 @@ class OverScrollerTrackFragment : BaseFragment(R.layout.fragment_test_over_scrol
         val finalX = overScroller.finalX
         val finalY = overScroller.finalY
         val isFinished = overScroller.isFinished
-        val isOverScrolled=overScroller.isOverScrolled
-        debug(
+        val isOverScrolled = overScroller.isOverScrolled
+        overScroller.debug(
             "computeScroll: \n" +
                     "computeScrollOffsetResult=${computeScrollOffsetResult} isFinished=${isFinished}\n" +
                     "startX=${startX} startY=${startY} finalX=${finalX} finalY=${finalY}\n" +
-                    "currX=${currX} currY=${currY} currVelocity=${currVelocity}\n"+
+                    "currX=${currX} currY=${currY} currVelocity=${currVelocity}\n" +
                     "isOverScrolled=${isOverScrolled}"
         )
 
@@ -61,6 +73,7 @@ class OverScrollerTrackFragment : BaseFragment(R.layout.fragment_test_over_scrol
             if (overScroller.computeScrollOffset()) {
                 binding.vTarget.translationX = currX.toFloat()
                 binding.vTarget.translationY = currY.toFloat()
+                binding.rgvRate.addTrackPoint(timePassed / 1000f, currX / 300f)
                 postNextFrame()
             }
         }

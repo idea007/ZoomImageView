@@ -3,45 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:orientation="vertical">
 
-    <LinearLayout
+
+    <Space
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="startScroll"
-            android:textAllCaps="false" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_force_finished"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="forceFinished"
-            android:textAllCaps="false" />
-
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_fling"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="fling"
-            android:textAllCaps="false" />
-
-    </LinearLayout>
-
+        android:layout_height="20dp" />
 
     <FrameLayout
         android:id="@+id/fl_content"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
         android:background="#20ff00ff">
 
         <View
@@ -51,6 +24,55 @@
             android:layout_gravity="center"
             android:background="#906a6da9" />
     </FrameLayout>
+
+
+    <com.dafay.demo.zoom.ui.view.RateGraphView
+        android:id="@+id/rgv_rate"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
+        android:background="#4000ffff">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="255dp"
+            android:text="0"
+            android:textColor="#979797" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="40dp"
+            android:text="1"
+            android:textColor="#979797" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="246dp"
+            android:layout_marginTop="255dp"
+            android:text="1"
+            android:textColor="#979797" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="265dp"
+            android:text="（time）"
+            android:textColor="#979797" />
+
+    </com.dafay.demo.zoom.ui.view.RateGraphView>
+
+    <com.dafay.demo.zoom.ui.view.TestButtonContainerView
+        android:id="@+id/cv_btn_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" />
 
 
 </LinearLayout>

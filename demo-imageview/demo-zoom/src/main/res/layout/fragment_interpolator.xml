@@ -82,7 +82,7 @@
     </FrameLayout>
 
 
-    <com.dafay.demo.zoom.interpolator.RateGraphView
+    <com.dafay.demo.zoom.ui.view.RateGraphView
         android:id="@+id/rgv_rate"
         android:layout_width="300dp"
         android:layout_height="300dp"
@@ -121,6 +121,6 @@
             android:text="（time）"
             android:textColor="#979797" />
 
-    </com.dafay.demo.zoom.interpolator.RateGraphView>
+    </com.dafay.demo.zoom.ui.view.RateGraphView>
 
 </LinearLayout>

@@ -1,4 +1,4 @@
-package com.dafay.demo.zoom.interpolator
+package com.dafay.demo.zoom.ui.view
 
 import android.content.Context
 import android.graphics.Canvas

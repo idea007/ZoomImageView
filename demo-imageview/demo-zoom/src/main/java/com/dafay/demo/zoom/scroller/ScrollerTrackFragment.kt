@@ -1,13 +1,17 @@
 package com.dafay.demo.zoom.scroller
 
 import android.view.Choreographer
+import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Scroller
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.dafay.demo.lib.base.ui.base.BaseFragment
 import com.dafay.demo.lib.base.utils.debug
+import com.dafay.demo.lib.base.utils.dp2px
 import com.dafay.demo.zoom.R
 import com.dafay.demo.zoom.databinding.FragmentScrollerTrackBinding
 import com.dafay.demo.zoom.databinding.FragmentTestScrollerViewBinding
+import com.google.android.material.button.MaterialButton
 
 class ScrollerTrackFragment : BaseFragment(R.layout.fragment_scroller_track) {
     override val binding: FragmentScrollerTrackBinding by viewBinding()
@@ -16,25 +20,27 @@ class ScrollerTrackFragment : BaseFragment(R.layout.fragment_scroller_track) {
 
     override fun initViews() {
         scroller = Scroller(requireContext())
+        initTestButtons()
     }
 
-    override fun bindListener() {
-        super.bindListener()
-
-        binding.btnStart.setOnClickListener {
+    private fun initTestButtons() {
+        binding.cvBtnContainer.addButton("startScroll", {
+            binding.rgvRate.clearTrack()
             scroller.startScroll(0, 0, 300, 300, 5000)
             postNextFrame()
-        }
+        })
 
-        binding.btnForceFinished.setOnClickListener {
+        binding.cvBtnContainer.addButton("forceFinished",{
             scroller.forceFinished(true)
-        }
+        })
 
-        binding.btnFling.setOnClickListener {
-            scroller.fling(0, 0, 1000, 1000, 0, 50, 0, 50)
+        binding.cvBtnContainer.addButton("fling",{
+            binding.rgvRate.clearTrack()
+            scroller.fling(0, 0, 1000, 1000, 0, 150, 0, 150)
             postNextFrame()
-        }
+        })
     }
+
 
     val choreographer = Choreographer.getInstance()
     private fun postNextFrame() {
@@ -61,6 +67,7 @@ class ScrollerTrackFragment : BaseFragment(R.layout.fragment_scroller_track) {
             if (scroller.computeScrollOffset()) {
                 binding.vTarget.translationX = currX.toFloat()
                 binding.vTarget.translationY = currY.toFloat()
+                binding.rgvRate.addTrackPoint(timePassed / duration.toFloat(), currX/300f)
                 postNextFrame()
             }
         }
