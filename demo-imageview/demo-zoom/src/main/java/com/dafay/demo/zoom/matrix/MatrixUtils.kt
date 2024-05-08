@@ -22,7 +22,6 @@ object MatrixUtils {
             if (!matrix.isIdentity) {
                 matrix = Matrix(matrix)
             } else {
-
                 val left: Int = imageView.getLeft()
                 val top: Int = imageView.getTop()
                 val right: Int = imageView.getRight()
