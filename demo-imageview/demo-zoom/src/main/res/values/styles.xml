@@ -1,0 +1,9 @@
+<resources>
+
+    <style name="Widget.InlineActionButton" parent="@android:style/Widget.Material.Button">
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:background">?android:selectableItemBackgroundBorderless</item>
+    </style>
+
+
+</resources>
