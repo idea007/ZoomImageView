@@ -9,7 +9,7 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
 
     override fun initViews() {
         super.initViews()
-        binding.zivImageview.setImageResource(R.mipmap.cover_01)
+        binding.zivImageview.setImageResource(R.mipmap.img_01)
     }
 
 }

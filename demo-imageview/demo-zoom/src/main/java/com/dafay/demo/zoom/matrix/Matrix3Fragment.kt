@@ -1,17 +1,14 @@
 package com.dafay.demo.zoom.matrix
 
 import android.graphics.Matrix
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.DisplayMetrics
 import android.widget.ImageView
 import android.widget.SeekBar
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.dafay.demo.lib.base.ui.base.BaseFragment
+import com.dafay.demo.lib.base.utils.debug
+import com.dafay.demo.lib.base.utils.dp2px
 import com.dafay.demo.zoom.R
-import com.dafay.demo.zoom.databinding.FragmentMatrix1Binding
 import com.dafay.demo.zoom.databinding.FragmentMatrix3Binding
 
 
@@ -32,17 +29,30 @@ class Matrix3Fragment : BaseFragment(R.layout.fragment_matrix3) {
     override fun initViews() {
         super.initViews()
 
-        binding.ivOriginImage.scaleType = ImageView.ScaleType.CENTER_CROP
-        binding.ivOriginImage.setImageResource(R.mipmap.img_4)
+        testDensity()
+
+        binding.ivOriginImage.scaleType = ImageView.ScaleType.MATRIX
+        binding.ivOriginImage.setImageResource(R.mipmap.img_01)
 
         binding.ivOriginImage.post(object : Runnable {
             override fun run() {
                 mViewCenterX = binding.ivOriginImage.width / 2f
                 mViewCenterY = binding.ivOriginImage.height / 2f
                 originMatrix = MatrixUtils.getImageViewMatrix(binding.ivOriginImage)
+                debug("viewWidth:${binding.ivOriginImage.width} viewHeight:${binding.ivOriginImage.height}" )
+                debug("drawableWidth:${binding.ivOriginImage.drawable.intrinsicWidth} drawableHeight:${binding.ivOriginImage.drawable.intrinsicHeight}" )
+                debug("originMatrix:${originMatrix.toString()}" )
                 originMatrix?.getValues(matrixValues)
             }
         })
+
+    }
+
+    private fun testDensity(){
+        debug("1.dp2px=${1.dp2px}")
+
+        val metrics = DisplayMetrics()
+        requireActivity().windowManager.getDefaultDisplay().getMetrics(metrics)
 
     }
 
