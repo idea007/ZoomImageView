@@ -121,26 +121,12 @@ class Matrix3Fragment : BaseFragment(R.layout.fragment_matrix3) {
         binding.sbZoom.setOnSeekBarChangeListener(object :
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-
                 var thumMatix = Matrix()
                 thumMatix.set(currMatrix)
                 thumMatix.postScale(progress / 10f,
                     progress / 10f,dx+drawableWidth/2,dy+drawableHeight/2)
                 debug("currMatrix:${thumMatix.toPrint()}")
                 binding.ivOriginImage.imageMatrix = thumMatix
-
-
-
-//                var thumMatix = Matrix()
-//                thumMatix?.postTranslate(dx, dy)
-//                thumMatix?.postRotate(rotation, mViewCenterX, mViewCenterY)
-//                thumMatix?.postScale(
-//                    progress / 10f,
-//                    progress / 10f,
-//                    mViewCenterX,
-//                    mViewCenterY
-//                )
-//                ImageViewUtils.animateTransform(binding.ivOriginImage, thumMatix)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {

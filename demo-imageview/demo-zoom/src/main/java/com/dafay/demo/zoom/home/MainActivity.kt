@@ -7,6 +7,7 @@ import com.dafay.demo.lib.base.ui.base.BaseActivity
 import com.dafay.demo.lib.base.utils.dp2px
 import com.dafay.demo.zoom.R
 import com.dafay.demo.zoom.databinding.ActivityMainBinding
+import com.dafay.demo.zoom.gesture.GestureDetectorExampleFragment
 import com.dafay.demo.zoom.host.HostActivity
 import com.dafay.demo.zoom.interpolator.CircleLayoutFragment
 import com.dafay.demo.zoom.interpolator.CoordinateSystem1Fragment
@@ -36,14 +37,18 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
         this.add(HomeItem("Scroller 运动特性", ScrollerTrackFragment::class.java))
         this.add(HomeItem("滚动文字", ScrollingTextViewFragment::class.java))
 
+        this.add(HomeItem("矩阵1", Matrix1Fragment::class.java))
+        this.add(HomeItem("矩阵2", Matrix2Fragment::class.java))
+        this.add(HomeItem("矩阵3", Matrix3Fragment::class.java))
+
+        this.add(HomeItem("手势", GestureDetectorExampleFragment::class.java))
+
         this.add(HomeItem("OverScroller 示例", TestOverScrollerViewFragment::class.java))
         this.add(HomeItem("OverScroller 运动特性", OverScrollerTrackFragment::class.java))
 
         this.add(HomeItem("OverScroller 应用", CircleLayoutFragment::class.java))
 
-        this.add(HomeItem("矩阵1", Matrix1Fragment::class.java))
-        this.add(HomeItem("矩阵2", Matrix2Fragment::class.java))
-        this.add(HomeItem("矩阵3", Matrix3Fragment::class.java))
+
 
     }
 

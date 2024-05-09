@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".gesture.GestureDetectorExampleFragment">
+
+    <com.dafay.demo.zoom.gesture.Gesture1ImageView
+        android:id="@+id/cv_custom"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@mipmap/img_01"
+        android:scaleType="matrix"
+        android:layout_marginTop="20dp"
+        android:background="#30ff00ff" />
+
+</FrameLayout>
