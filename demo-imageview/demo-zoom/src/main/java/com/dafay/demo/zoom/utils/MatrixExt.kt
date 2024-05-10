@@ -24,3 +24,15 @@ fun Matrix.transY(): Float {
     return values[Matrix.MTRANS_Y]
 }
 
+/**
+ * @Des
+ * @Author m1studio
+ * @Date 2024/4/25
+ * <a href=" ">相关链接</a>
+ */
+fun Matrix.scaleX():Float{
+    val values = FloatArray(9)
+    this.getValues(values)
+    return values[Matrix.MSCALE_X]
+}
+

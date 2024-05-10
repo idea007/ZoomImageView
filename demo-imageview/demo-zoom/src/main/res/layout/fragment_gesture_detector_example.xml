@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".gesture.GestureDetectorExampleFragment">
 
-    <com.dafay.demo.zoom.gesture.Gesture1ImageView
+    <com.dafay.demo.zoom.gesture.Gesture11ImageView
         android:id="@+id/cv_custom"
         android:layout_width="300dp"
         android:layout_height="300dp"

@@ -10,7 +10,10 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import com.dafay.demo.lib.base.utils.debug
+import com.dafay.demo.zoom.utils.scaleX
 import com.dafay.demo.zoom.utils.toPrint
+import com.dafay.demo.zoom.utils.transX
+import com.dafay.demo.zoom.utils.transY
 
 /**
  * 示例
@@ -18,7 +21,7 @@ import com.dafay.demo.zoom.utils.toPrint
  * 问题1：点击图片之外的地方
  * 问题2：多次缩放之后图片大小变了
  */
-class Gesture1ImageView @kotlin.jvm.JvmOverloads constructor(
+class Gesture11ImageView @kotlin.jvm.JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -27,7 +30,8 @@ class Gesture1ImageView @kotlin.jvm.JvmOverloads constructor(
     // 手势检测器
     private val gestureDetector: GestureDetector
     private val originMatrix = Matrix()
-    private val currMatrix = Matrix()
+//    private val cuppMatrix = Matrix()
+    private val suppMatrix = Matrix()
 
     private val simpleOnGestureListener = object : GestureDetector.SimpleOnGestureListener() {
         override fun onDown(e: MotionEvent): Boolean {
@@ -97,6 +101,9 @@ class Gesture1ImageView @kotlin.jvm.JvmOverloads constructor(
 
     private var zoomAnim = ValueAnimator().apply { duration = DEFAULT_ANIM_DURATION }
 
+    private var drawableWidth = 0f
+    private var drawableHeight = 0f
+
     init {
         gestureDetector = GestureDetector(context, simpleOnGestureListener)
 
@@ -107,19 +114,29 @@ class Gesture1ImageView @kotlin.jvm.JvmOverloads constructor(
         })
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+
+        drawableWidth = drawable.intrinsicWidth.toFloat()
+        drawableHeight = drawable.intrinsicHeight.toFloat()
+    }
+
     // 双击执行缩放动画
     private fun playZoomAnim(e: MotionEvent) {
         // 点击的点设置为缩放的中心点
         val focalPoint = PointF(e.x, e.y)
+        val dx=0f
+        val dy=0f
 
         val animatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
             override fun onAnimationUpdate(animation: ValueAnimator) {
+
                 val tempValue = animation.animatedValue as Float
-                val deltaScale = 1 + tempValue - currZoom
-                currMatrix.postScale(deltaScale, deltaScale, focalPoint.x, focalPoint.y)
-                debug("tempValue-currZoom= ${tempValue - currZoom} currMatrix:${currMatrix.toPrint()}")
-                imageMatrix = currMatrix
-                currZoom = tempValue
+                suppMatrix.setTranslate(dx,dy)
+                suppMatrix.postScale(tempValue,tempValue,focalPoint.x, focalPoint.y)
+                debug("tempValue=${tempValue} currScale=${suppMatrix.scaleX()} currMatrix:${suppMatrix.toPrint()}")
+                updateImageMatrix()
+                currZoom = suppMatrix.scaleX()
             }
         }
 
@@ -132,6 +149,14 @@ class Gesture1ImageView @kotlin.jvm.JvmOverloads constructor(
             zoomAnim.addUpdateListener(animatorUpdateListener)
             zoomAnim.start()
         }
+    }
+
+    private fun updateImageMatrix(){
+        val drawMatrix=Matrix()
+        drawMatrix.set(originMatrix)
+        // 即当前 Matrix 会乘以传入的 Matrix。
+        drawMatrix.postConcat(suppMatrix)
+        imageMatrix=drawMatrix
     }
 
 
