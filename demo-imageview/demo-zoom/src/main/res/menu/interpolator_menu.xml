@@ -22,7 +22,12 @@
     <item android:title="AccelerateInterpolator" />
     <item android:title="AnticipateInterpolator" />
     <item android:title="AnticipateOvershootInterpolator" />
+    <item android:title="BounceInterpolator" />
+    <item android:title="CycleInterpolator" />
+    <item android:title="DecelerateInterpolator" />
     <item android:title="LinearInterpolator" />
+    <item android:title="OvershootInterpolator" />
+    <item android:title="PathInterpolator" />
 
 
 </menu>

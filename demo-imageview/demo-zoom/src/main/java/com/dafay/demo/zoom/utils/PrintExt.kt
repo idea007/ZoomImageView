@@ -1,6 +1,5 @@
 package com.dafay.demo.zoom.utils
 
-import android.graphics.Matrix
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 
@@ -22,4 +21,5 @@ fun ScaleGestureDetector.toPrint():String{
             "focusX=${this.focusX}, focusY=${this.focusY}, isInProgress=${this.isInProgress}, scaleFactor=${this.scaleFactor}}"
 
 }
+
 
