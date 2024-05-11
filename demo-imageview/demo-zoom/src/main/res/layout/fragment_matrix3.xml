@@ -116,6 +116,12 @@
 
     </LinearLayout>
 
+    <com.dafay.demo.zoom.ui.view.TestButtonContainerView
+        android:id="@+id/cv_btn_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" />
+
 
 </LinearLayout>
 

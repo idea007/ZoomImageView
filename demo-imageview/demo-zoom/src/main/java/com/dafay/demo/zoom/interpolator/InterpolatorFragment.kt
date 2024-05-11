@@ -60,7 +60,7 @@ class InterpolatorFragment : BaseFragment(R.layout.fragment_interpolator) {
 
     private fun showInterpolatorMenu(v: View) {
         val popup = PopupMenu(v.context, v)
-        popup.menuInflater.inflate(R.menu.color_mode_popup_menu, popup.menu)
+        popup.menuInflater.inflate(R.menu.interpolator_menu, popup.menu)
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->
             val menuItemTitle = menuItem.title.toString()
             binding.tvName.text = menuItemTitle

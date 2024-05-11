@@ -24,15 +24,33 @@ fun Matrix.transY(): Float {
     return values[Matrix.MTRANS_Y]
 }
 
-/**
- * @Des
- * @Author m1studio
- * @Date 2024/4/25
- * <a href=" ">相关链接</a>
- */
-fun Matrix.scaleX():Float{
+fun Matrix.scaleX(): Float {
     val values = FloatArray(9)
     this.getValues(values)
     return values[Matrix.MSCALE_X]
 }
+
+fun Matrix.scaleY(): Float {
+    val values = FloatArray(9)
+    this.getValues(values)
+    return values[Matrix.MSCALE_Y]
+}
+
+fun Matrix.translateBy(dx: Float, dy: Float) {
+    this.postTranslate(dx, dy)
+}
+
+fun Matrix.translateTo(x: Float, y: Float) {
+    this.postTranslate(-this.transX() + x, -this.transY() + y)
+}
+
+fun Matrix.zoomBy(factor: Float, pivotX: Float, pivotY: Float) {
+    this.postScale(factor, factor, pivotX, pivotY)
+}
+
+fun Matrix.zoomTo(zoom: Float, pivotX: Float, pivotY: Float) {
+    this.postScale(zoom / this.scaleX(), zoom / this.scaleY(), pivotX, pivotY)
+}
+
+
 

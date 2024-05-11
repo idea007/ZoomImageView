@@ -134,34 +134,50 @@ class Gesture22ImageView @kotlin.jvm.JvmOverloads constructor(
      * 2. 当前 matrix,基于每次变换的差值变化
      */
     private fun dealZoomAnim(e: MotionEvent) {
-        // 点击的点设置为缩放的中心点
-        val focalPoint = PointF(e.x, e.y)
-        // 缩放之后平移的值已改变，不能直接使用
-        val dx = suppMatrix.transX()
-        val dy = suppMatrix.transY()
-        debug("dx=${dx} dy=${dy}}")
+        val currScale=suppMatrix.scaleX()
+        val targetScale=if(Math.abs(currScale - maxZoom) > Math.abs(currScale - minZoom)) maxZoom else minZoom
+        playZoomAnim(currScale,targetScale,e.x,e.y)
+    }
 
+    private fun playZoomAnim(startScale:Float,targetScale:Float,focusX:Float,focusY:Float){
+        zoomAnim.removeAllUpdateListeners()
+        zoomAnim.cancel()
+        var startMatrix=Matrix(suppMatrix)
         val animatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
             override fun onAnimationUpdate(animation: ValueAnimator) {
                 val tempValue = animation.animatedValue as Float
-                suppMatrix.setTranslate(dx, dy)
-                suppMatrix.postScale(tempValue, tempValue, focalPoint.x, focalPoint.y)
-                debug("tempValue=${tempValue} currScale=${suppMatrix.scaleX()} currMatrix:${suppMatrix.toPrint()}")
+                suppMatrix.set(startMatrix)
+                debug("suppMatrix=${suppMatrix.toPrint()} tempValue=${tempValue}")
+                suppMatrix.postScale(tempValue,tempValue,1f,1f)
                 applyImageMatrix()
-                currZoom = suppMatrix.scaleX()
+
+//                var deltaScale=1+tempValue-preScale
+//                debug("startScale=${startScale} targetScale=${targetScale} deltaScale = ${deltaScale}")
+//                if(deltaScale==1f){
+//                    return
+//                }
+//                if(startScale<targetScale && preScale<targetScale){
+//                    suppMatrix.postScale(deltaScale, deltaScale, focusX, focusY)
+//                    debug("currMatrix:${suppMatrix.toPrint()}")
+//                    applyImageMatrix()
+//                }else if(startScale>targetScale && preScale>minZoom){
+//                    suppMatrix.postScale(deltaScale, deltaScale, focusX, focusY)
+//                    debug("currMatrix:${suppMatrix.toPrint()}")
+//                    applyImageMatrix()
+//                }else{
+//                    val delta = targetScale / preScale
+//                    suppMatrix.postScale(delta, delta, focusX, focusY)
+//                    applyImageMatrix()
+//                }
+//                preScale=tempValue
             }
         }
+        zoomAnim = ValueAnimator.ofFloat(startScale, targetScale).apply { duration = DEFAULT_ANIM_DURATION }
+        zoomAnim.addUpdateListener(animatorUpdateListener)
+        zoomAnim.start()
 
-        if (Math.abs(currZoom - maxZoom) > Math.abs(currZoom - minZoom)) {
-            zoomAnim = ValueAnimator.ofFloat(currZoom, maxZoom).apply { duration = DEFAULT_ANIM_DURATION }
-            zoomAnim.addUpdateListener(animatorUpdateListener)
-            zoomAnim.start()
-        } else {
-            zoomAnim = ValueAnimator.ofFloat(currZoom, minZoom).apply { duration = DEFAULT_ANIM_DURATION }
-            zoomAnim.addUpdateListener(animatorUpdateListener)
-            zoomAnim.start()
-        }
     }
+
 
     /**
      * 把变换后的效果应用给 ImageView

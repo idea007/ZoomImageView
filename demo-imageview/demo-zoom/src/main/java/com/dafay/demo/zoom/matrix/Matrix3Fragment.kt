@@ -51,6 +51,34 @@ class Matrix3Fragment : BaseFragment(R.layout.fragment_matrix3) {
             }
         })
 
+        initTestButtons()
+
+    }
+
+    private fun initTestButtons() {
+        binding.cvBtnContainer.addButton("translateX 10px", {
+            currMatrix.postTranslate(10f, 0f)
+            debug("currMatrix:${currMatrix.toPrint()}")
+            binding.ivOriginImage.imageMatrix = currMatrix
+        })
+
+        binding.cvBtnContainer.addButton("translateX -10px", {
+            currMatrix.postTranslate(-10f, 0f)
+            debug("currMatrix:${currMatrix.toPrint()}")
+            binding.ivOriginImage.imageMatrix = currMatrix
+        })
+
+        binding.cvBtnContainer.addButton("postScale 1.1f", {
+            currMatrix.postScale(1.1f, 1.1f)
+            debug("currMatrix:${currMatrix.toPrint()}")
+            binding.ivOriginImage.imageMatrix = currMatrix
+        })
+
+        binding.cvBtnContainer.addButton("postScale 0.9f", {
+            currMatrix.postScale(0.9f, 0.9f)
+            debug("currMatrix:${currMatrix.toPrint()}")
+            binding.ivOriginImage.imageMatrix = currMatrix
+        })
     }
 
 
