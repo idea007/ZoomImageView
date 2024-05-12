@@ -6,24 +6,26 @@
     android:orientation="vertical"
     tools:context=".gesture.GestureDetectorExampleFragment">
 
-    <com.dafay.demo.zoom.gesture.Gesture03ImageView
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="right"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="#30ff00ff"
+        android:scaleType="fitCenter"
+        android:src="@mipmap/img_01" />
+
+
+    <com.dafay.demo.zoom.gesture.Gesture04ImageView
         android:id="@+id/giv_image_view"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_gravity="center_horizontal"
-        android:src="@mipmap/img_01"
+        android:layout_marginTop="20dp"
+        android:background="#30ff00ff"
         android:scaleType="matrix"
-        android:layout_marginTop="20dp"
-        android:background="#30ff00ff" />
-
-    <ImageView
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_gravity="center_horizontal"
-        android:src="@mipmap/img_01"
-        android:scaleType="fitCenter"
-        android:layout_marginTop="20dp"
-        android:background="#30ff00ff" />
+        android:src="@mipmap/img_01" />
 
 
     <com.dafay.demo.zoom.ui.view.TestButtonContainerView
