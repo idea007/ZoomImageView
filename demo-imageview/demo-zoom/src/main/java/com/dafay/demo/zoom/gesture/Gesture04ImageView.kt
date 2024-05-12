@@ -27,8 +27,6 @@ import com.dafay.demo.zoom.utils.zoomTo
 /**
  * 功能
  * 边界处理，左上右下移动超出边界时进行矫正
- * 问题：
- * pivot 点没有做动画
  */
 class Gesture04ImageView @kotlin.jvm.JvmOverloads constructor(
     context: Context,
