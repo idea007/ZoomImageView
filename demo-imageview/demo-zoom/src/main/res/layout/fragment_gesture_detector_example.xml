@@ -26,7 +26,7 @@
         android:src="@mipmap/img_01" />
 
 
-    <com.dafay.demo.zoom.gesture.Gesture041ImageView
+    <com.dafay.demo.zoom.gesture.Gesture06ImageView
         android:id="@+id/giv_image_view"
         android:layout_width="300dp"
         android:layout_height="300dp"

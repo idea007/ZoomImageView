@@ -32,7 +32,11 @@ class OverScrollerTrackFragment : BaseFragment(R.layout.fragment_test_over_scrol
         })
 
         binding.cvBtnContainer.addButton("fling", {
-            overScroller.fling(0, 0, 1000, 1000, 0, 80, 0, 80, 200, 200)
+//            overScroller.fling(0, 0, 1000, 1000, 0, 80, 0, 80, 200, 200)
+
+//            startX=741 startY=53 velocityX=-6817.6943 velocityY=-1057.0782 minX=0 maxX=2160 minY=0 maxY=302
+//            overScroller.fling(0, 0, 6817/5, 1057/5, -2160, 2160, -302, 302, 0, 0)
+            overScroller.fling(0, 0, -6817/5, -1057/5, Int.MIN_VALUE, Int.MAX_VALUE, Int.MIN_VALUE, Int.MAX_VALUE, 0, 0)
             startAnim()
         })
     }

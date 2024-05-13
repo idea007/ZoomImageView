@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".gesture.FullScreenZoomImageViewFragment">
+
+    <com.dafay.demo.zoom.gesture.Gesture06ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#30ff00ff"
+        android:scaleType="matrix"
+        android:src="@mipmap/img_01" />
+
+</FrameLayout>

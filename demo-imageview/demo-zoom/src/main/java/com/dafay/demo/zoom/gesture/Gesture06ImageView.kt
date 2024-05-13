@@ -12,10 +12,13 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.AttributeSet
+import android.view.Choreographer
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.view.animation.AnimationUtils
+import android.widget.OverScroller
 import androidx.appcompat.widget.AppCompatImageView
 import com.dafay.demo.lib.base.utils.debug
 import com.dafay.demo.zoom.utils.MathUtils
@@ -27,10 +30,9 @@ import com.dafay.demo.zoom.utils.zoomTo
 
 /**
  * 功能
- * 边界处理，左上右下移动超出边界时进行矫正
- * 问题：缩放动画，起始 matrix 和 终止 matrix 过程中，povit 点也要随着动画进度做改变
+ * 拖动响应 onfling
  */
-class Gesture05ImageView @kotlin.jvm.JvmOverloads constructor(
+class Gesture06ImageView @kotlin.jvm.JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -48,7 +50,12 @@ class Gesture05ImageView @kotlin.jvm.JvmOverloads constructor(
     private var maxZoom = DEFAULT_MAX_ZOOM
     private var zoomAnim = ValueAnimator().apply { duration = DEFAULT_ANIM_DURATION }
 
+    // 用来执行 onFling 动画
+    private lateinit var overScroller: OverScroller
+
+
     init {
+        overScroller = OverScroller(context)
         val multiGestureDetector = MultiGestureDetector()
         gestureDetector = GestureDetector(context, multiGestureDetector)
         scaleGestureDetector = ScaleGestureDetector(context, multiGestureDetector)
@@ -174,7 +181,6 @@ class Gesture05ImageView @kotlin.jvm.JvmOverloads constructor(
             }
         }
         zoomAnim.setFloatValues(startZoom, endZoom)
-//        zoomAnim = ValueAnimator.ofFloat(startZoom, endZoom).apply { duration = DEFAULT_ANIM_DURATION }
         zoomAnim.addUpdateListener(animatorUpdateListener)
         zoomAnim.start()
     }
@@ -253,6 +259,69 @@ class Gesture05ImageView @kotlin.jvm.JvmOverloads constructor(
     private fun dealOnScroll(distanceX: Float, distanceY: Float) {
         suppMatrix.translateBy(-distanceX, -distanceY)
         applyToImageMatrix()
+    }
+
+    /**
+     * 处理 onFling
+     */
+    private fun dealOnFling(e2: MotionEvent, velocityX: Float, velocityY: Float) {
+        val rect = getDrawMatrixRect(imageMatrix) ?: return
+        val startX = Math.round(-rect.left)
+        val minX: Int
+        val maxX: Int
+        val minY: Int
+        val maxY: Int
+        if (width < rect.width()) {
+            minX = 0
+            maxX = Math.round(rect.width() - width)
+        } else {
+            maxX = startX
+            minX = maxX
+        }
+        val startY = Math.round(-rect.top)
+        if (height < rect.height()) {
+            minY = 0
+            maxY = Math.round(rect.height() - height)
+        } else {
+            maxY = startY
+            minY = maxY
+        }
+        preX = startX
+        preY = startY
+
+        if (!((startX != maxX) || (startY != maxY))) {
+            return
+        }
+        debug("startX=${startX} startY=${startY} velocityX=${velocityX} velocityY=${velocityY} minX=${minX} maxX=${maxX} minY=${minY} maxY=${maxY}")
+        overScroller.fling(startX, startY, (velocityX/2).toInt(), (velocityY/2).toInt(), minX, maxX, minY, maxY, 0, 0)
+        startFlingAnim()
+    }
+
+    private var startTime: Long = 0
+    private val choreographer = Choreographer.getInstance()
+    private var preX = 0
+    private var preY = 0
+    private fun startFlingAnim() {
+        startTime = AnimationUtils.currentAnimationTimeMillis()
+        postNextFrame()
+    }
+
+    private fun postNextFrame() {
+        debug("overScroller:${overScroller.toPrint()}")
+        val currX = overScroller.currX
+        val currY = overScroller.currY
+        val dx = currX - preX
+        val dy = currY - preY
+        preX = currX
+        preY = currY
+        debug("dx=${dx} dy=${dy}")
+        suppMatrix.translateBy(dx.toFloat(), dy.toFloat())
+        applyToImageMatrix()
+        choreographer.postFrameCallback {
+            if (overScroller.computeScrollOffset()) {
+                postNextFrame()
+            }
+        }
     }
 
     /**
@@ -411,6 +480,16 @@ class Gesture05ImageView @kotlin.jvm.JvmOverloads constructor(
             debug("onScroll e1=${e1?.toPrint()} e2=${e2.toPrint()} distanceX=${distanceX} distanceY=${distanceY}")
             dealOnScroll(distanceX, distanceY)
             return super.onScroll(e1, e2, distanceX, distanceY)
+        }
+
+        /**
+         * 当发生 fling 事件时，使用初始 on down MotionEvent 和匹配的 up MotionEvent 通知该事件。
+         * 计算出的速度沿 x 轴和 y 轴提供，单位为每秒像素
+         */
+        override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+            debug("onFling e1=${e1?.toPrint()} e2=${e2.toPrint()} velocityX=${velocityX} velocityY=${velocityY}")
+            dealOnFling(e2, velocityX, velocityY)
+            return super.onFling(e1, e2, velocityX, velocityY)
         }
 
         override fun onScale(detector: ScaleGestureDetector): Boolean {

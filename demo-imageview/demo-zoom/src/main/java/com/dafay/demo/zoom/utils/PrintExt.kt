@@ -2,8 +2,9 @@ package com.dafay.demo.zoom.utils
 
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
+import android.widget.OverScroller
 
-fun MotionEvent.toPrint():String {
+fun MotionEvent.toPrint(): String {
     return "MotionEvent { action=${MotionEvent.actionToString(this.action)}, x=${this.x},y=${this.y} }"
 
 }
@@ -14,12 +15,19 @@ fun MotionEvent.toPrint():String {
  * timeDelta 两个事件间隔时间
  * scaleFactor currentSpan/previousSpan
  */
-fun ScaleGestureDetector.toPrint():String{
+fun ScaleGestureDetector.toPrint(): String {
     return "ScaleGestureDetector { currentSpan=${this.currentSpan}, currentSpanX=${this.currentSpanX}, currentSpanY=${this.currentSpanY}," +
-            "previousSpan=${this.previousSpan}, previousSpanX=${this.previousSpanX}, previousSpanY=${this.previousSpanY},"+
-            "eventTime=${this.eventTime},timeDelta=${this.timeDelta}, isQuickScaleEnabled=${this.isQuickScaleEnabled},"+
+            "previousSpan=${this.previousSpan}, previousSpanX=${this.previousSpanX}, previousSpanY=${this.previousSpanY}," +
+            "eventTime=${this.eventTime},timeDelta=${this.timeDelta}, isQuickScaleEnabled=${this.isQuickScaleEnabled}," +
             "focusX=${this.focusX}, focusY=${this.focusY}, isInProgress=${this.isInProgress}, scaleFactor=${this.scaleFactor}}"
 
 }
 
 
+fun OverScroller.toPrint(): String {
+    return "computeScrollOffsetResult=${computeScrollOffset()} isFinished=${isFinished}\n" +
+            "startX=${startX} startY=${startY} finalX=${finalX} finalY=${finalY}\n" +
+            "currX=${currX} currY=${currY} currVelocity=${currVelocity}\n" +
+            "isOverScrolled=${isOverScrolled}"
+
+}
