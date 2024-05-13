@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".home.MainActivity">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +28,7 @@
     </LinearLayout>
 
 
-    <com.dafay.demo.zoom.scroller.TestScrollerFrameLayout
+    <com.dafay.demo.zoom.ui.page.scroller.TestScrollerFrameLayout
         android:id="@+id/fl_scroller_test"
         android:layout_width="300dp"
         android:layout_height="300dp"
@@ -43,9 +42,9 @@
             android:layout_gravity="center"
             android:background="#906a6da9" />
 
-    </com.dafay.demo.zoom.scroller.TestScrollerFrameLayout>
+    </com.dafay.demo.zoom.ui.page.scroller.TestScrollerFrameLayout>
 
-    <com.dafay.demo.zoom.scroller.TestScrollerView
+    <com.dafay.demo.zoom.ui.page.scroller.TestScrollerView
         android:id="@+id/ssv_scroller"
         android:layout_width="300dp"
         android:layout_height="300dp"

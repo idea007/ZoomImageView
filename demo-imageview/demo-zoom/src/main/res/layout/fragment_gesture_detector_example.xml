@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".gesture.GestureDetectorExampleFragment">
+    android:orientation="vertical">
 
     <ImageView
         android:layout_width="60dp"
@@ -16,17 +15,8 @@
         android:scaleType="fitCenter"
         android:src="@mipmap/img_01" />
 
-    <com.dafay.demo.zoom.gesture.Gesture04ImageView
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"
-        android:background="#30ff00ff"
-        android:scaleType="matrix"
-        android:src="@mipmap/img_01" />
 
-
-    <com.dafay.demo.zoom.gesture.Gesture06ImageView
+    <com.dafay.demo.zoom.ui.page.gesture.Gesture06ImageView
         android:id="@+id/giv_image_view"
         android:layout_width="300dp"
         android:layout_height="300dp"

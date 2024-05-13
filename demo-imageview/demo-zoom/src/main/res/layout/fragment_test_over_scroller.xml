@@ -36,7 +36,7 @@
     </LinearLayout>
 
 
-    <com.dafay.demo.zoom.overscroller.TestOverScrollerFrameLayout
+    <com.dafay.demo.zoom.ui.page.overscroller.TestOverScrollerFrameLayout
         android:id="@+id/fl_scroller_test"
         android:layout_width="300dp"
         android:layout_height="300dp"
@@ -50,7 +50,7 @@
             android:layout_gravity="center"
             android:background="#906a6da9" />
 
-    </com.dafay.demo.zoom.overscroller.TestOverScrollerFrameLayout>
+    </com.dafay.demo.zoom.ui.page.overscroller.TestOverScrollerFrameLayout>
 
 
 </LinearLayout>

@@ -11,7 +11,7 @@
      android:orientation="vertical">
 
 
-     <com.dafay.demo.zoom.matrix.SetPolyToPoly
+     <com.dafay.demo.zoom.ui.page.matrix.SetPolyToPoly
          android:id="@+id/poly"
          android:layout_width="300dp"
          android:layout_height="300dp"/>

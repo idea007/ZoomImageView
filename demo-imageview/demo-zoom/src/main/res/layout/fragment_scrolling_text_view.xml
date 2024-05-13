@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.dafay.demo.zoom.scroller.AnimTextView
+        <com.dafay.demo.zoom.ui.page.scroller.AnimTextView
             android:id="@+id/atv_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
