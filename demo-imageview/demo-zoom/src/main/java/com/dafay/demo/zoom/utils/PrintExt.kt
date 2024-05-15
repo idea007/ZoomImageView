@@ -3,6 +3,8 @@ package com.dafay.demo.zoom.utils
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.widget.OverScroller
+import android.widget.Scroller
+import com.dafay.demo.lib.base.utils.debug
 
 fun MotionEvent.toPrint(): String {
     return "MotionEvent { action=${MotionEvent.actionToString(this.action)}, x=${this.x},y=${this.y} }"
@@ -25,9 +27,18 @@ fun ScaleGestureDetector.toPrint(): String {
 
 
 fun OverScroller.toPrint(): String {
-    return "computeScrollOffsetResult=${computeScrollOffset()} isFinished=${isFinished}\n" +
+    return "computeScrollOffset=${computeScrollOffset()} isFinished=${isFinished}\n" +
             "startX=${startX} startY=${startY} finalX=${finalX} finalY=${finalY}\n" +
             "currX=${currX} currY=${currY} currVelocity=${currVelocity}\n" +
             "isOverScrolled=${isOverScrolled}"
+}
+
+
+fun Scroller.toPrint(): String {
+    return "\n" +
+            "computeScrollOffset=${this.computeScrollOffset()} isFinished=${isFinished}\n" +
+            "startX=${startX} startY=${startY} finalX=${finalX} finalY=${finalY}\n" +
+            "currX=${currX} currY=${currY} currVelocity=${currVelocity}\n" +
+            "duration=${duration} timePassed=${timePassed()}"
 
 }

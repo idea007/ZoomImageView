@@ -26,8 +26,8 @@
     </FrameLayout>
 
 
-    <com.dafay.demo.zoom.ui.view.RateGraphView
-        android:id="@+id/rgv_rate"
+    <com.dafay.demo.zoom.ui.view.CoordinateSystemView
+        android:id="@+id/csv_coord"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_marginTop="10dp"
@@ -35,38 +35,94 @@
         android:background="#4000ffff">
 
         <TextView
+            android:id="@+id/tv_origin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
-            android:layout_marginTop="255dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
             android:text="0"
             android:textColor="#979797" />
 
         <TextView
+            android:id="@+id/tv_y_axis_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
-            android:layout_marginTop="40dp"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginRight="12dp"
+            android:layout_marginBottom="20dp"
             android:text="1"
             android:textColor="#979797" />
 
         <TextView
+            android:id="@+id/tv_x_axis_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="246dp"
-            android:layout_marginTop="255dp"
+          android:layout_gravity="center_vertical|right"
+            android:layout_marginEnd="26dp"
+            android:layout_marginTop="15dp"
+
             android:text="1"
             android:textColor="#979797" />
 
         <TextView
+            android:id="@+id/tv_x_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="265dp"
+            android:layout_gravity="center_vertical|right"
+            android:layout_marginEnd="0dp"
+            android:layout_marginTop="-20dp"
             android:text="（time）"
             android:textColor="#979797" />
 
-    </com.dafay.demo.zoom.ui.view.RateGraphView>
+    </com.dafay.demo.zoom.ui.view.CoordinateSystemView>
+
+<!--    <com.dafay.demo.zoom.ui.view.RateGraphView-->
+<!--        android:id="@+id/rgv_rate"-->
+<!--        android:layout_width="300dp"-->
+<!--        android:layout_height="300dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:background="#4000ffff">-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/tv_origin"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="35dp"-->
+<!--            android:layout_marginTop="255dp"-->
+<!--            android:text="0"-->
+<!--            android:textColor="#979797" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/tv_y_axis_name"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="35dp"-->
+<!--            android:layout_marginTop="40dp"-->
+<!--            android:text="1"-->
+<!--            android:textColor="#979797" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/tv_x_axis_name"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="246dp"-->
+<!--            android:layout_marginTop="255dp"-->
+<!--            android:text="1"-->
+<!--            android:textColor="#979797" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/tv_x_label"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="center_horizontal"-->
+<!--            android:layout_marginTop="265dp"-->
+<!--            android:text="（time）"-->
+<!--            android:textColor="#979797" />-->
+
+<!--    </com.dafay.demo.zoom.ui.view.RateGraphView>-->
+
 
     <com.dafay.demo.zoom.ui.view.TestButtonContainerView
         android:id="@+id/cv_btn_container"

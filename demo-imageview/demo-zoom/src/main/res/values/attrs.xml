@@ -20,6 +20,12 @@
     </declare-styleable>
 
 
+    <declare-styleable name="CoordinateSystemView">
+        <attr name="originOffsetRatio" format="float" />
+        <attr name="unitLengthRatio" format="float" />
+    </declare-styleable>
+
+
 
 
 
