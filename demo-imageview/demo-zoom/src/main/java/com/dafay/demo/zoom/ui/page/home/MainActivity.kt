@@ -12,6 +12,7 @@ import com.dafay.demo.zoom.ui.page.host.HostActivity
 import com.dafay.demo.zoom.ui.page.interpolator.CircleLayoutFragment
 import com.dafay.demo.zoom.ui.page.interpolator.CoordinateSystem1Fragment
 import com.dafay.demo.zoom.ui.page.interpolator.CoordinateSystem2Fragment
+import com.dafay.demo.zoom.ui.page.interpolator.CoordinateSystem3Fragment
 import com.dafay.demo.zoom.ui.page.interpolator.InterpolatorFragment
 import com.dafay.demo.zoom.ui.page.matrix.Matrix1Fragment
 import com.dafay.demo.zoom.ui.page.matrix.Matrix2Fragment
@@ -29,6 +30,7 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
     private val homeItemList = ArrayList<HomeItem>().apply {
         this.add(HomeItem("Canvas 参考坐标系 1", CoordinateSystem1Fragment::class.java))
         this.add(HomeItem("Canvas 参考坐标系 2", CoordinateSystem2Fragment::class.java))
+        this.add(HomeItem("Canvas 参考坐标系 3", CoordinateSystem3Fragment::class.java))
 
         this.add(HomeItem("Interpolator 速率图", InterpolatorFragment::class.java))
 

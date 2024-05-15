@@ -1,9 +1,5 @@
 package com.dafay.demo.zoom.ui.page.interpolator
 
-import android.annotation.SuppressLint
-import android.graphics.drawable.InsetDrawable
-import android.os.Build
-import android.util.TypedValue
 import android.view.Choreographer
 import android.view.MenuItem
 import android.view.View
@@ -12,9 +8,13 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.AnimationUtils
 import android.view.animation.AnticipateInterpolator
 import android.view.animation.AnticipateOvershootInterpolator
+import android.view.animation.BounceInterpolator
+import android.view.animation.CycleInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.Interpolator
 import android.view.animation.LinearInterpolator
-import androidx.appcompat.view.menu.MenuBuilder
+import android.view.animation.OvershootInterpolator
+import android.view.animation.PathInterpolator
 import androidx.appcompat.widget.PopupMenu
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.dafay.demo.lib.base.ui.base.BaseFragment
@@ -41,6 +41,7 @@ class InterpolatorFragment : BaseFragment(R.layout.fragment_interpolator) {
     // 动画开启的时间
     private var startTime: Long = 0
 
+    // 编舞器，用来模拟动画
     private val choreographer = Choreographer.getInstance()
 
     override fun initViews() {
@@ -69,6 +70,11 @@ class InterpolatorFragment : BaseFragment(R.layout.fragment_interpolator) {
                 "AccelerateInterpolator" -> AccelerateInterpolator()
                 "AnticipateInterpolator" -> AnticipateInterpolator()
                 "AnticipateOvershootInterpolator" -> AnticipateOvershootInterpolator()
+                "BounceInterpolator" -> BounceInterpolator()
+                "CycleInterpolator" -> CycleInterpolator(1.0f)
+                "DecelerateInterpolator" -> DecelerateInterpolator()
+                "OvershootInterpolator" -> OvershootInterpolator()
+                "PathInterpolator" -> PathInterpolator(0f, 1f)
                 else -> LinearInterpolator()
             }
             return@setOnMenuItemClickListener true
@@ -85,7 +91,6 @@ class InterpolatorFragment : BaseFragment(R.layout.fragment_interpolator) {
         postNextFrame()
     }
 
-
     /**
      * 递归执行动画，直到时间走完
      */
@@ -94,6 +99,7 @@ class InterpolatorFragment : BaseFragment(R.layout.fragment_interpolator) {
         if (timePassed > duration) {
             return
         }
+        // 插值值，当前进度[0,1]，带入插值器求值公式求得
         val output: Float = curInterpolator.getInterpolation(timePassed * durationReciprocal)
         debug("timePassed=${timePassed} output=${output}")
         binding.vMobile.translationY = 200.dp2px * output

@@ -26,7 +26,7 @@ class ScrollerTrackFragment : BaseFragment(R.layout.fragment_scroller_track) {
     private fun initTestButtons() {
         binding.cvBtnContainer.addButton("startScroll", {
             binding.rgvRate.clearTrack()
-            scroller.startScroll(0, 0, 300, 300, 5000)
+            scroller.startScroll(0, 0, 300, 300, 1000)
             postNextFrame()
         })
 
