@@ -23,7 +23,7 @@
         android:layout_gravity="center_horizontal"/>
 
 
-    <com.dafay.demo.zoom.ui.page.gesture.Gesture06ImageView
+    <com.dafay.demo.zoom.ui.page.gesture.Gesture07ImageView
         android:id="@+id/giv_image_view"
         android:layout_width="300dp"
         android:layout_height="300dp"

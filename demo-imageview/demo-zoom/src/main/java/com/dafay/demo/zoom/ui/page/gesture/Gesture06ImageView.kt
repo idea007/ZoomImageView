@@ -53,7 +53,7 @@ class Gesture06ImageView @kotlin.jvm.JvmOverloads constructor(
         DEFAULT_ANIM_DURATION
     }
     // 用来执行 onFling 动画
-    private lateinit var overScroller: OverScroller
+    private  var overScroller: OverScroller
     init {
         overScroller = OverScroller(context)
         val multiGestureDetector = MultiGestureDetector()
@@ -94,9 +94,6 @@ class Gesture06ImageView @kotlin.jvm.JvmOverloads constructor(
         updateOriginMatrix(drawable)
     }
 
-    /**
-     *
-     */
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         debug("onSizeChanged")
