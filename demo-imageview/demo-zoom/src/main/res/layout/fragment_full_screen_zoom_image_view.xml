@@ -9,6 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#30ff00ff"
-        android:src="@mipmap/img_01" />
+        android:src="@mipmap/img_05" />
 
 </FrameLayout>
