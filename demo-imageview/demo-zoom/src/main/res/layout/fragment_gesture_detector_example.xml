@@ -16,6 +16,13 @@
         android:src="@mipmap/img_01" />
 
 
+    <com.dafay.demo.zoom.ui.view.ZoomImageView1
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:src="@mipmap/img_01"
+        android:layout_gravity="center_horizontal"/>
+
+
     <com.dafay.demo.zoom.ui.page.gesture.Gesture06ImageView
         android:id="@+id/giv_image_view"
         android:layout_width="300dp"

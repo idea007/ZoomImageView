@@ -15,6 +15,7 @@ import android.view.animation.Interpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
+import android.widget.Scroller
 import androidx.appcompat.widget.PopupMenu
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.dafay.demo.lib.base.ui.base.BaseFragment
@@ -75,6 +76,7 @@ class InterpolatorFragment : BaseFragment(R.layout.fragment_interpolator) {
                 "DecelerateInterpolator" -> DecelerateInterpolator()
                 "OvershootInterpolator" -> OvershootInterpolator()
                 "PathInterpolator" -> PathInterpolator(0f, 1f)
+                "ViscousFluidInterpolator"-> ViscousFluidInterpolator()
                 else -> LinearInterpolator()
             }
             return@setOnMenuItemClickListener true

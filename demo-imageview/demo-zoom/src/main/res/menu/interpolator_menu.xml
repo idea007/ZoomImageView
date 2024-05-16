@@ -28,6 +28,7 @@
     <item android:title="LinearInterpolator" />
     <item android:title="OvershootInterpolator" />
     <item android:title="PathInterpolator" />
+    <item android:title="ViscousFluidInterpolator" />
 
 
 </menu>

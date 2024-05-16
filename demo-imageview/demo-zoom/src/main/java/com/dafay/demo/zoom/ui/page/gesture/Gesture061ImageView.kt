@@ -30,10 +30,9 @@ import com.dafay.demo.zoom.utils.zoomTo
 
 /**
  * 功能
- * 边界处理，左上右下移动超出边界时进行矫正
- * 问题：缩放动画，起始 matrix 和 终止 matrix 过程中，povit 点也要随着动画进度做改变
+ * 拖动响应 onfling
  */
-class Gesture06ImageView @kotlin.jvm.JvmOverloads constructor(
+class Gesture061ImageView @kotlin.jvm.JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -47,13 +46,16 @@ class Gesture06ImageView @kotlin.jvm.JvmOverloads constructor(
     private val originMatrix = Matrix()
     val suppMatrix = Matrix()
 
-    private var minZoom = DEFAULT_MIN_ZOOM
-    private var maxZoom = DEFAULT_MAX_ZOOM
+    private var minZoom = com.dafay.demo.zoom.ui.page.gesture.DEFAULT_MIN_ZOOM
+    private var maxZoom = com.dafay.demo.zoom.ui.page.gesture.DEFAULT_MAX_ZOOM
     private var zoomAnim = ValueAnimator().apply { duration =
-        DEFAULT_ANIM_DURATION
+        com.dafay.demo.zoom.ui.page.gesture.DEFAULT_ANIM_DURATION
     }
+
     // 用来执行 onFling 动画
     private lateinit var overScroller: OverScroller
+
+
     init {
         overScroller = OverScroller(context)
         val multiGestureDetector = MultiGestureDetector()
@@ -104,6 +106,7 @@ class Gesture06ImageView @kotlin.jvm.JvmOverloads constructor(
     }
 
     /**
+     * TODO: 1. 暂时只处理类 fitCenter 显示这一种，2. 忽视 pading
      * 计算图片显示类似 fitCenter 效果时的矩阵
      */
     private fun updateOriginMatrix(drawable: Drawable?) {
@@ -180,7 +183,6 @@ class Gesture06ImageView @kotlin.jvm.JvmOverloads constructor(
             }
         }
         zoomAnim.setFloatValues(startZoom, endZoom)
-//        zoomAnim = ValueAnimator.ofFloat(startZoom, endZoom).apply { duration = DEFAULT_ANIM_DURATION }
         zoomAnim.addUpdateListener(animatorUpdateListener)
         zoomAnim.start()
     }
@@ -253,10 +255,17 @@ class Gesture06ImageView @kotlin.jvm.JvmOverloads constructor(
         return tmpMatrix
     }
 
-    private var startTime: Long = 0
-    private val choreographer = Choreographer.getInstance()
-    private var currentX = 0
-    private var currentY = 0
+    /**
+     * 处理拖动（平移）事件
+     */
+    private fun dealOnScroll(distanceX: Float, distanceY: Float) {
+        suppMatrix.translateBy(-distanceX, -distanceY)
+        applyToImageMatrix()
+    }
+
+    /**
+     * 处理 onFling
+     */
     private fun dealOnFling(e2: MotionEvent, velocityX: Float, velocityY: Float) {
         val rect = getDrawMatrixRect(imageMatrix) ?: return
         val startX = Math.round(-rect.left)
@@ -279,42 +288,42 @@ class Gesture06ImageView @kotlin.jvm.JvmOverloads constructor(
             maxY = startY
             minY = maxY
         }
-        currentX = startX
-        currentY = startY
+        preX = startX
+        preY = startY
 
         if (!((startX != maxX) || (startY != maxY))) {
             return
         }
         debug("startX=${startX} startY=${startY} velocityX=${velocityX} velocityY=${velocityY} minX=${minX} maxX=${maxX} minY=${minY} maxY=${maxY}")
-        overScroller.fling(startX, startY, -velocityX.toInt(), -velocityY.toInt(), minX, maxX, minY, maxY, 0, 0)
+        overScroller.fling(startX, startY, (velocityX/2).toInt(), (velocityY/2).toInt(), minX, maxX, minY, maxY, 0, 0)
         startFlingAnim()
     }
 
+    private var startTime: Long = 0
+    private val choreographer = Choreographer.getInstance()
+    private var preX = 0
+    private var preY = 0
     private fun startFlingAnim() {
         startTime = AnimationUtils.currentAnimationTimeMillis()
         postNextFrame()
     }
 
     private fun postNextFrame() {
-        if (overScroller.computeScrollOffset()) {
-            val currX = overScroller.currX
-            val currY = overScroller.currY
-            suppMatrix.translateBy((currentX-currX).toFloat(), (currentY-currY).toFloat())
-            applyToImageMatrix()
-            currentX = currX
-            currentY = currY
-            choreographer.postFrameCallback {
+        debug("overScroller:${overScroller.toPrint()}")
+        val currX = overScroller.currX
+        val currY = overScroller.currY
+        val dx = currX - preX
+        val dy = currY - preY
+        preX = currX
+        preY = currY
+        debug("dx=${dx} dy=${dy}")
+        suppMatrix.translateBy(dx.toFloat(), dy.toFloat())
+        applyToImageMatrix()
+        choreographer.postFrameCallback {
+            if (overScroller.computeScrollOffset()) {
                 postNextFrame()
             }
         }
-    }
-
-    /**
-     * 处理拖动（平移）事件
-     */
-    private fun dealOnScroll(distanceX: Float, distanceY: Float) {
-        suppMatrix.translateBy(-distanceX, -distanceY)
-        applyToImageMatrix()
     }
 
     /**

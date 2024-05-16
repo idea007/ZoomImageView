@@ -1,4 +1,4 @@
-package com.dafay.demo.zoom.imageview
+package com.dafay.demo.zoom.ui.view
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -16,8 +16,8 @@ import android.view.ViewConfiguration
 import android.view.ViewTreeObserver
 import android.widget.OverScroller
 import androidx.appcompat.widget.AppCompatImageView
-import com.dafay.demo.lib.base.utils.ScreenUtils
 import com.dafay.demo.lib.base.utils.debug
+import com.dafay.demo.zoom.utils.scaleX
 
 /**
  * 实现思路：

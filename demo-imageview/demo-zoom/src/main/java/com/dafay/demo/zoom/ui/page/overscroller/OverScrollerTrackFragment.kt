@@ -31,7 +31,15 @@ class OverScrollerTrackFragment : BaseFragment(R.layout.fragment_test_over_scrol
         })
 
         binding.cvBtnContainer.addButton("fling", {
-            overScroller.fling(0, 0, 1000, 1000, 0, 80, 0, 80, 200, 200)
+
+
+            // overScroller.fling(0, 0, 1000, 1000, 0, 80, 0, 80, 200, 200)
+
+            // velocityX=-4351.1235 velocityY=-342.71777
+            // overScroller.fling(0, 0, -4351, -342, -5000, 5000, -5000, 5000, 0, 0)
+
+            // startX=3924 startY=857 velocityX=-3966 velocityY=-1048 minX=0 maxX=4360 minY=0 maxY=1954
+            overScroller.fling(3924, 857, -3966, -1048, -5000, 5000, -5000, 5000, 0, 0)
             startAnim()
         })
     }
@@ -53,9 +61,9 @@ class OverScrollerTrackFragment : BaseFragment(R.layout.fragment_test_over_scrol
         debug("overScroller:${overScroller.toPrint()}")
         choreographer.postFrameCallback {
             if (overScroller.computeScrollOffset()) {
-                binding.vTarget.translationX = overScroller.currX.toFloat()
-                binding.vTarget.translationY = overScroller.currX.toFloat()
-                binding.csvCoord.addPoint(timePassed / 1000f, overScroller.currX / 300f)
+                binding.vTarget.translationX = overScroller.currX.toFloat()/10
+                binding.vTarget.translationY = overScroller.currX.toFloat()/10
+                binding.csvCoord.addPoint(timePassed / 1000f, overScroller.currX / 1000f)
                 postNextFrame()
             }
         }
