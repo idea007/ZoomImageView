@@ -14,7 +14,7 @@
         android:visibility="gone"/>
 
 
-    <com.dafay.demo.zoom.ui.page.gesture.Zoom03ImageView
+    <com.dafay.demo.zoom.ui.page.gesture.Zoom07ImageView
         android:id="@+id/giv_image_view"
         android:layout_width="300dp"
         android:layout_height="300dp"
