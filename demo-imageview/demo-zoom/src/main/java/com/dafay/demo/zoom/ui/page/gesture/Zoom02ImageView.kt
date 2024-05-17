@@ -48,6 +48,7 @@ class Zoom02ImageView @kotlin.jvm.JvmOverloads constructor(
                 if (gestureDetector.onTouchEvent(event)) {
                     return true
                 }
+                // 上面返回 false,scaleGestureDetector.onTouchEvent(event) 便会返回 true,onDoubleTap 事件得以响应，这块逻辑待深入研究
                 return scaleGestureDetector.onTouchEvent(event)
             }
         })

@@ -26,11 +26,11 @@ class GestureDetectorExampleFragment : BaseFragment(R.layout.fragment_gesture_de
 //            binding.givImageView.applyToImageMatrix()
 //        })
 
-//        binding.cvBtnContainer.addButton("模拟双击放大动画过程中，图片切换为高清", {
-//            binding.givImageView.playZoomAnim(-100f, -100f)
-//            binding.givImageView.postDelayed({
-//                binding.givImageView.setImageResource(R.mipmap.img_03)
-//            }, 1000L)
-//        })
+        binding.cvBtnContainer.addButton("模拟双击放大动画过程中，图片切换为高清", {
+            binding.givImageView.playZoomAnim(-100f, -100f)
+            binding.givImageView.postDelayed({
+                binding.givImageView.setImageResource(R.mipmap.img_03)
+            }, 500L)
+        })
     }
 }
