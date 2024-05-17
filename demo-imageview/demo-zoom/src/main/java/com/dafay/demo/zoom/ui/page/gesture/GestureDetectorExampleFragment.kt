@@ -16,15 +16,15 @@ class GestureDetectorExampleFragment : BaseFragment(R.layout.fragment_gesture_de
     }
 
     private fun initTestButtons() {
-        binding.cvBtnContainer.addButton("translateX 10px", {
-            binding.givImageView.suppMatrix.postTranslate(10f, 0f)
-            binding.givImageView.applyToImageMatrix()
-        })
-
-        binding.cvBtnContainer.addButton("translateY 10px", {
-            binding.givImageView.suppMatrix.postTranslate(0f, 10f)
-            binding.givImageView.applyToImageMatrix()
-        })
+//        binding.cvBtnContainer.addButton("translateX 10px", {
+//            binding.givImageView.suppMatrix.postTranslate(10f, 0f)
+//            binding.givImageView.applyToImageMatrix()
+//        })
+//
+//        binding.cvBtnContainer.addButton("translateY 10px", {
+//            binding.givImageView.suppMatrix.postTranslate(0f, 10f)
+//            binding.givImageView.applyToImageMatrix()
+//        })
 
 //        binding.cvBtnContainer.addButton("模拟双击放大动画过程中，图片切换为高清", {
 //            binding.givImageView.playZoomAnim(-100f, -100f)

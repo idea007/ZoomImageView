@@ -18,7 +18,6 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.ImageView
 import android.widget.OverScroller
 import androidx.appcompat.widget.AppCompatImageView
 import com.dafay.demo.lib.base.utils.debug
@@ -31,9 +30,10 @@ import com.dafay.demo.zoom.utils.zoomTo
 
 /**
  * 功能
- * over zoom 处理
+ * 边界处理，左上右下移动超出边界时进行矫正
+ * 问题：缩放动画，起始 matrix 和 终止 matrix 过程中，povit 点也要随着动画进度做改变
  */
-class Gesture07ImageView @kotlin.jvm.JvmOverloads constructor(
+class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -49,34 +49,26 @@ class Gesture07ImageView @kotlin.jvm.JvmOverloads constructor(
 
     private var minZoom = DEFAULT_MIN_ZOOM
     private var maxZoom = DEFAULT_MAX_ZOOM
-    private var zoomAnim = ValueAnimator().apply { duration = DEFAULT_ANIM_DURATION }
-
+    private var zoomAnim = ValueAnimator().apply { duration =
+        DEFAULT_ANIM_DURATION
+    }
     // 用来执行 onFling 动画
-    private var overScroller: OverScroller
-    private var overMinZoomRadio = 0.75f
-
+    private  var overScroller: OverScroller
     init {
-        scaleType=ScaleType.MATRIX
         overScroller = OverScroller(context)
         val multiGestureDetector = MultiGestureDetector()
         gestureDetector = GestureDetector(context, multiGestureDetector)
         scaleGestureDetector = ScaleGestureDetector(context, multiGestureDetector)
         setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View, event: MotionEvent): Boolean {
-                debug("onTouch ${event.toPrint()}")
                 if (gestureDetector.onTouchEvent(event)) {
                     return true
                 }
                 // 上面返回 false,scaleGestureDetector.onTouchEvent(event) 便会返回 true,onDoubleTap 事件得以响应，这块逻辑待深入研究
-                scaleGestureDetector.onTouchEvent(event)
-                if (event.getActionMasked() == MotionEvent.ACTION_UP || event.getActionMasked() == MotionEvent.ACTION_CANCEL) {
-                    dealUpOrCancel(event)
-                }
-                return true
+                return scaleGestureDetector.onTouchEvent(event)
             }
         })
     }
-
 
     override fun setImageDrawable(drawable: Drawable?) {
         super.setImageDrawable(drawable)
@@ -133,32 +125,17 @@ class Gesture07ImageView @kotlin.jvm.JvmOverloads constructor(
      * 双击执行缩放动画
      */
     private fun dealOnDoubleTap(e: MotionEvent) {
-        animZoom(e.x, e.y)
+        playZoomAnim(e.x, e.y)
     }
 
-    private fun animZoom(pivotX: Float, pivotY: Float) {
-        val currZoom = suppMatrix.scaleX()
-        val endZoom = if (Math.abs(currZoom - maxZoom) > Math.abs(currZoom - minZoom)) maxZoom else minZoom
-        playZoomAnim(currZoom, endZoom, pivotX, pivotY)
-    }
-
-    private fun dealUpOrCancel(event: MotionEvent) {
-        debug("dealUpOrCancel event=${event.toPrint()}")
-        val currZoom = suppMatrix.scaleX()
-        if (currZoom < minZoom) {
-            val rect = getDrawMatrixRect(imageMatrix)
-            rect?.let { playZoomAnim(currZoom, minZoom, it.centerX(), it.centerY()) }
-        }
-    }
-
-    fun playZoomAnim(startZoom: Float, endZoom: Float, pivotX: Float, pivotY: Float) {
+    fun playZoomAnim(pivotX: Float, pivotY: Float) {
         zoomAnim.removeAllUpdateListeners()
         zoomAnim.cancel()
 
         // 点击的点设置为缩放的支点
         pivotPointF.set(pivotX, pivotY)
-//        val startZoom = suppMatrix.scaleX()
-//        val endZoom = if (Math.abs(startZoom - maxZoom) > Math.abs(startZoom - minZoom)) maxZoom else minZoom
+        val startZoom = suppMatrix.scaleX()
+        val endZoom = if (Math.abs(startZoom - maxZoom) > Math.abs(startZoom - minZoom)) maxZoom else minZoom
 
         val startMatrix = Matrix(imageMatrix)
         val endMatrix = Matrix(originMatrix).apply {
@@ -174,6 +151,8 @@ class Gesture07ImageView @kotlin.jvm.JvmOverloads constructor(
         val endPivotPointF = PointF(tmpPointArr[0], tmpPointArr[1])
 
         debug("playZoomAnim startZoom=${startZoom} endZoom=${endZoom} startPivotPointF:${pivotPointF} endPivotPointF=${endPivotPointF}}")
+
+        testSuppMatrix(startMatrix, pivotPointF, endMatrix, endPivotPointF)
 
         val animatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
             override fun onAnimationUpdate(animation: ValueAnimator) {
@@ -198,10 +177,78 @@ class Gesture07ImageView @kotlin.jvm.JvmOverloads constructor(
             }
         }
         zoomAnim.setFloatValues(startZoom, endZoom)
+//        zoomAnim = ValueAnimator.ofFloat(startZoom, endZoom).apply { duration = DEFAULT_ANIM_DURATION }
         zoomAnim.addUpdateListener(animatorUpdateListener)
         zoomAnim.start()
     }
 
+    private fun testSuppMatrix(startMatrix: Matrix, pivotPointF: PointF, endMatrix: Matrix, endPivotPointF: PointF) {
+
+        val currMatrix1 = MathUtils.interpolate(
+            startMatrix,
+            this.pivotPointF.x,
+            this.pivotPointF.y,
+            endMatrix,
+            endPivotPointF.x,
+            endPivotPointF.y,
+            0f
+        )
+
+        val currMatrix2 = MathUtils.interpolate(
+            startMatrix,
+            this.pivotPointF.x,
+            this.pivotPointF.y,
+            endMatrix,
+            endPivotPointF.x,
+            endPivotPointF.y,
+            0.2f
+        )
+
+        val currMatrix5 = MathUtils.interpolate(
+            startMatrix,
+            this.pivotPointF.x,
+            this.pivotPointF.y,
+            endMatrix,
+            endPivotPointF.x,
+            endPivotPointF.y,
+            0.5f
+        )
+
+        val currMatrix10 = MathUtils.interpolate(
+            startMatrix,
+            this.pivotPointF.x,
+            this.pivotPointF.y,
+            endMatrix,
+            endPivotPointF.x,
+            endPivotPointF.y,
+            1f
+        )
+
+        // 对比 先移动 和 后移动 是否一致
+        val suppMatrix = Matrix().apply {
+            this.zoomTo(2f, 0f, 0f)
+        }
+        val matrix1 = Matrix(originMatrix).apply {
+            this.postConcat(suppMatrix)
+        }
+        matrix1.translateBy(10f, 10f)
+
+        val matrix2 = Matrix(originMatrix).apply {
+            suppMatrix.translateBy(10f, 10f)
+            this.postConcat(suppMatrix)
+        }
+        debug("matrix1=${matrix1} matrix2=${matrix2}")
+    }
+
+    /**
+     * test 用
+     */
+    private fun invertSuppMatrix(currMatrix: Matrix): Matrix {
+        val tmpMatrix = Matrix()
+        originMatrix.invert(tmpMatrix)
+        tmpMatrix.postConcat(currMatrix)
+        return tmpMatrix
+    }
 
     private var startTime: Long = 0
     private val choreographer = Choreographer.getInstance()
@@ -249,7 +296,7 @@ class Gesture07ImageView @kotlin.jvm.JvmOverloads constructor(
         if (overScroller.computeScrollOffset()) {
             val currX = overScroller.currX
             val currY = overScroller.currY
-            suppMatrix.translateBy((currentX - currX).toFloat(), (currentY - currY).toFloat())
+            suppMatrix.translateBy((currentX-currX).toFloat(), (currentY-currY).toFloat())
             applyToImageMatrix()
             currentX = currX
             currentY = currY
@@ -274,21 +321,17 @@ class Gesture07ImageView @kotlin.jvm.JvmOverloads constructor(
         val currScale: Float = suppMatrix.scaleX()
         var scaleFactor = detector.scaleFactor
         debug("currScale=${currScale} scaleFactor=${scaleFactor} detector.focusX=${detector.focusX} detector.focusY=${detector.focusY}")
-        if ((currScale >= maxZoom && scaleFactor > 1f) || (currScale <= minZoom * overMinZoomRadio && scaleFactor < 1f)) {
+        if (currScale < minZoom || currScale > maxZoom) {
             return
         }
-
-//        if (currScale < minZoom || currScale > maxZoom) {
-//            return
-//        }
-//        // 临界值限制
-//        if (currScale * scaleFactor < minZoom) {
-//            scaleFactor = minZoom / currScale
-//        }
-//        // 临界值限制
-//        if (currScale * scaleFactor > maxZoom) {
-//            scaleFactor = maxZoom / currScale
-//        }
+        // 临界值限制
+        if (currScale * scaleFactor < minZoom) {
+            scaleFactor = minZoom / currScale
+        }
+        // 临界值限制
+        if (currScale * scaleFactor > maxZoom) {
+            scaleFactor = maxZoom / currScale
+        }
         suppMatrix.zoomBy(scaleFactor, detector.focusX, detector.focusY)
         applyToImageMatrix()
     }

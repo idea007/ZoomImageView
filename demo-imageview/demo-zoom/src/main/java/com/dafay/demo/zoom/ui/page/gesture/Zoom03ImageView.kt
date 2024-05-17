@@ -2,11 +2,15 @@ package com.dafay.demo.zoom.ui.page.gesture
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.PointF
+import android.graphics.RectF
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -22,12 +26,11 @@ import com.dafay.demo.zoom.utils.zoomTo
 
 /**
  * 功能
- * 1. 支持双指缩放
+ * 1. 初始化处理
  * 问题：
- * 1. scaleGestureDetector、gestureDetector 响应
- * 2. 可添加 onScroll、onScale 的触发 scaledTouchSlop 限定
+ * 1. 同一张图片的高清、低清切换的问题（图片宽高比一样）,例如执行放大过程中切换
  */
-class Gesture02ImageView @kotlin.jvm.JvmOverloads constructor(
+class Zoom03ImageView @kotlin.jvm.JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -36,6 +39,8 @@ class Gesture02ImageView @kotlin.jvm.JvmOverloads constructor(
     // 手势检测器
     private val gestureDetector: GestureDetector
     private val scaleGestureDetector: ScaleGestureDetector
+
+    // scaleType matrix，计算图片显示类似 fitCenter 效果时的矩阵
     private val originMatrix = Matrix()
     val suppMatrix = Matrix()
 
@@ -54,20 +59,79 @@ class Gesture02ImageView @kotlin.jvm.JvmOverloads constructor(
                 if (gestureDetector.onTouchEvent(event)) {
                     return true
                 }
+                // 上面返回 false,scaleGestureDetector.onTouchEvent(event) 便会返回 true,onDoubleTap 事件得以响应，这块逻辑待深入研究
                 return scaleGestureDetector.onTouchEvent(event)
             }
         })
     }
+
+    override fun setImageDrawable(drawable: Drawable?) {
+        super.setImageDrawable(drawable)
+        debug("setImageDrawable")
+        updateOriginMatrix(drawable)
+    }
+
+    override fun setImageBitmap(bm: Bitmap?) {
+        super.setImageBitmap(bm)
+        debug("setImageBitmap")
+        updateOriginMatrix(drawable)
+    }
+
+    override fun setImageResource(resId: Int) {
+        super.setImageResource(resId)
+        debug("setImageResource")
+        updateOriginMatrix(drawable)
+    }
+
+    override fun setImageURI(uri: Uri?) {
+        super.setImageURI(uri)
+        debug("setImageURI")
+        updateOriginMatrix(drawable)
+    }
+
+    /**
+     *
+     */
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        debug("onSizeChanged")
+        updateOriginMatrix(drawable)
+    }
+
+    /**
+     * TODO: 1. 暂时只处理类 fitCenter 显示这一种，2. 忽视 pading
+     * 计算图片显示类似 fitCenter 效果时的矩阵
+     */
+    private fun updateOriginMatrix(drawable: Drawable?) {
+        drawable ?: return
+        if (width <= 0) {
+            return
+        }
+        val viewWidth = width.toFloat()
+        val viewHeight = height.toFloat()
+        val drawableWidth = drawable.intrinsicWidth
+        val drawableHeight = drawable.intrinsicHeight
+        originMatrix.reset()
+        val tempSrc = RectF(0f, 0f, drawableWidth.toFloat(), drawableHeight.toFloat())
+        val tempDst = RectF(0f, 0f, viewWidth, viewHeight)
+        originMatrix.setRectToRect(tempSrc, tempDst, Matrix.ScaleToFit.CENTER)
+        applyToImageMatrix()
+    }
+
 
     /**
      * 处理双击事件
      * 双击执行缩放动画
      */
     private fun dealOnDoubleTap(e: MotionEvent) {
+        playZoomAnimTap(e.x, e.y)
+    }
+
+    fun playZoomAnimTap(pivotX: Float, pivotY: Float) {
         // 点击的点设置为缩放的中心点
         pivotPointF.apply {
-            x = e.x
-            y = e.y
+            x = pivotX
+            y = pivotY
         }
 
         val animatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
@@ -187,10 +251,12 @@ class Gesture02ImageView @kotlin.jvm.JvmOverloads constructor(
         }
 
         override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+            debug("onScaleBegin detector=${detector.toPrint()}")
             return true
         }
 
         override fun onScaleEnd(detector: ScaleGestureDetector) {
+            debug("onScaleEnd detector=${detector.toPrint()}")
         }
     }
 
