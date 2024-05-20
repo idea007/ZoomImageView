@@ -19,18 +19,10 @@ import androidx.appcompat.widget.AppCompatImageView
 import com.dafay.demo.lib.base.utils.debug
 import com.dafay.demo.zoom.utils.scaleX
 
-/**
- * 实现思路：
- * 1. 先初始化， imageView 要设置成  super.setScaleType(ScaleType.MATRIX)
- *  图片尺寸与 view 尺寸映射得到 baseMatrix（设置图片时机是早于 onmearch 的）
- *  初始化考虑问题，baseMatrix 相对于原图，如果这个过程切换图片（低清晰度切换高清晰度）
- *
- * 2. 点击缩放
- * 动画自然过渡
- *
- * 3.拖动，边际判断（如果 overscroller 怎么处理）
- */
 
+/**
+ * 原始的 ZoomImageView1
+ */
 class ZoomImageView1 @JvmOverloads constructor(context: Context, attr: AttributeSet? = null, defStyle: Int = 0) :
     AppCompatImageView(context, attr, defStyle), View.OnTouchListener, ViewTreeObserver.OnGlobalLayoutListener {
 

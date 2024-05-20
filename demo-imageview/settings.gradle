@@ -13,8 +13,5 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "demo-image"
-include ':apps:demo-scroller'
-include ':apps:demo-zoom-imageview'
 include ':lib-base'
-include ':apps:demo-gesture-detector'
 include ':demo-zoom'
