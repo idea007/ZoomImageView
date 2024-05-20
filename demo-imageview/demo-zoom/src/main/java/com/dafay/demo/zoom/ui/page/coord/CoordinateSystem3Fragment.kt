@@ -1,4 +1,4 @@
-package com.dafay.demo.zoom.ui.page.interpolator
+package com.dafay.demo.zoom.ui.page.coord
 
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.dafay.demo.lib.base.ui.base.BaseFragment

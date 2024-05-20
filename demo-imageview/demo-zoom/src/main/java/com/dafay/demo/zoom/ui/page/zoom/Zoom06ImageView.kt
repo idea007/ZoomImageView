@@ -1,4 +1,4 @@
-package com.dafay.demo.zoom.ui.page.gesture
+package com.dafay.demo.zoom.ui.page.zoom
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -17,6 +17,8 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.OverScroller
 import androidx.appcompat.widget.AppCompatImageView
+import com.dafay.demo.lib.base.utils.debug
+import com.dafay.demo.zoom.utils.MathUtils
 import com.dafay.demo.zoom.utils.scaleX
 import com.dafay.demo.zoom.utils.translateBy
 import com.dafay.demo.zoom.utils.zoomBy
@@ -24,9 +26,10 @@ import com.dafay.demo.zoom.utils.zoomTo
 
 /**
  * 实现功能
- * 快速滑动 fling 处理
+ * 1. 解决双击缩放到最小过程中，动画过渡不自然的问题（边界矫正太过生硬），
+ * 解决思路：缩放动画，起始 matrix 和 终止 matrix 过程中，povit 支点也要随着动画进度做改变
  */
-class Zoom05ImageView @kotlin.jvm.JvmOverloads constructor(
+class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -118,21 +121,56 @@ class Zoom05ImageView @kotlin.jvm.JvmOverloads constructor(
         playZoomAnim(e.x, e.y)
     }
 
-    private fun playZoomAnim(pivotX: Float, pivotY: Float) {
+    /**
+     * 改变动画实现方式
+     */
+    fun playZoomAnim(pivotX: Float, pivotY: Float) {
         zoomAnim.removeAllUpdateListeners()
         zoomAnim.cancel()
-        // 点击的点设置为缩放的中心点
+
+        // 点击的点设置为缩放的支点
         pivotPointF.set(pivotX, pivotY)
+        val startZoom = suppMatrix.scaleX()
+        val endZoom = if (Math.abs(startZoom - maxZoom) > Math.abs(startZoom - minZoom)) maxZoom else minZoom
+
+        val startMatrix = Matrix(imageMatrix)
+        val endMatrix = Matrix(originMatrix).apply {
+            val tempSuppMatrix = Matrix(suppMatrix)
+            tempSuppMatrix.zoomTo(endZoom, pivotPointF.x, pivotPointF.y)
+            this.postConcat(tempSuppMatrix)
+        }
+        // 边界矫正
+        correctByViewBound(endMatrix).let {
+            endMatrix.translateBy(it.x, it.y)
+        }
+
+        val tmpPointArr = floatArrayOf(pivotX, pivotY)
+        MathUtils.computeNewPosition(tmpPointArr, imageMatrix, endMatrix)
+        val endPivotPointF = PointF(tmpPointArr[0], tmpPointArr[1])
+
         val animatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
             override fun onAnimationUpdate(animation: ValueAnimator) {
                 val tempValue = animation.animatedValue as Float
-                suppMatrix.zoomTo(tempValue, pivotPointF.x, pivotPointF.y)
-                applyToImageMatrix()
+                val factor = (tempValue - startZoom) / (endZoom - startZoom)
+                debug("playZoomAnim factor=${factor}")
+                val currMatrix = MathUtils.interpolate(
+                    startMatrix,
+                    pivotPointF.x,
+                    pivotPointF.y,
+                    endMatrix,
+                    endPivotPointF.x,
+                    endPivotPointF.y,
+                    factor
+                )
+                // suppMatrix * originMatrix = currMatrix;  suppMatrix = currMatrix *（originMatrix 的逆矩阵）
+                val tmpMatrix = Matrix()
+                originMatrix.invert(tmpMatrix)
+                tmpMatrix.postConcat(currMatrix)
+                suppMatrix.set(tmpMatrix)
+                applyToImageMatrix(true)
             }
         }
-        val currZoom = suppMatrix.scaleX()
-        val endZoom = if (Math.abs(currZoom - maxZoom) > Math.abs(currZoom - minZoom)) maxZoom else minZoom
-        zoomAnim.setFloatValues(currZoom, endZoom)
+        zoomAnim.setFloatValues(startZoom, endZoom)
         zoomAnim.addUpdateListener(animatorUpdateListener)
         zoomAnim.start()
     }
@@ -209,19 +247,16 @@ class Zoom05ImageView @kotlin.jvm.JvmOverloads constructor(
         }
     }
 
-
     /**
-     * 在显示之前，进行边界矫正，对 suppMatrix 进行调整
+     * 对输入矩阵，依据 View 宽高进行调整，输出需要调整的平移量
      */
-    private fun correctSuppMatrix() {
-        // 目标 matrix
-        val tempMatrix = Matrix(originMatrix).apply { postConcat(suppMatrix) }
+    private fun correctByViewBound(srcMatrix: Matrix): PointF {
+        val tempPointF = PointF()
         // 得到 matrix 的 rect
-        val tempRectF = getDrawMatrixRect(tempMatrix)
-        tempRectF ?: return
+        val tempRectF = getDrawMatrixRect(srcMatrix)
+        tempRectF ?: return tempPointF
         var deltaX = 0f
         var deltaY = 0f
-
         if (tempRectF.height() < height) {
             deltaY = ((height - tempRectF.height()) / 2) - tempRectF.top
         } else if (tempRectF.top > 0) {
@@ -229,7 +264,6 @@ class Zoom05ImageView @kotlin.jvm.JvmOverloads constructor(
         } else if (tempRectF.bottom < height) {
             deltaY = height - tempRectF.bottom
         }
-
         if (tempRectF.width() <= width) {
             deltaX = ((width - tempRectF.width()) / 2) - tempRectF.left
         } else if (tempRectF.left > 0) {
@@ -237,31 +271,46 @@ class Zoom05ImageView @kotlin.jvm.JvmOverloads constructor(
         } else if (tempRectF.right < width) {
             deltaX = width - tempRectF.right
         }
-        suppMatrix.translateBy(deltaX, deltaY)
+        tempPointF.set(deltaX, deltaY)
+        return tempPointF
     }
 
     private fun getDrawMatrixRect(matrix: Matrix): RectF? {
         val d = drawable
         if (null != d) {
             val tempRect = RectF()
-            // 什么新奇的写法
+            // 新奇的写法
             tempRect[0f, 0f, d.intrinsicWidth.toFloat()] = d.intrinsicHeight.toFloat()
+            debug("getDrawMatrixRect tempRect=${tempRect}")
             matrix.mapRect(tempRect)
+            debug("getDrawMatrixRect tempRect=${tempRect}")
             return tempRect
         }
         return null
     }
 
+    /**
+     * 在显示之前，进行边界矫正，对 suppMatrix 进行调整
+     */
+    private fun correctSuppMatrix() {
+        // 目标 matrix
+        val tempMatrix = Matrix(originMatrix).apply { postConcat(suppMatrix) }
+        correctByViewBound(tempMatrix).let {
+            suppMatrix.translateBy(it.x, it.y)
+        }
+    }
 
     /**
      * 应用于 ImageView 的 matrix，为了思路清晰，这里先频繁创建对象 drawMatrix
      */
-    private fun applyToImageMatrix() {
-        // 在应用之前，进行边界矫正
-        correctSuppMatrix()
+    private fun applyToImageMatrix(skipCorrect: Boolean = false) {
+        if (!skipCorrect) {
+            // 在应用之前，进行边界矫正
+            correctSuppMatrix()
+        }
         val drawMatrix = Matrix()
         drawMatrix.set(originMatrix)
-        // drawMatrix = suppMatrix * originMatrix
+        // 即当前 Matrix 会乘以传入的 Matrix。 suppMatrix*originMatrix
         drawMatrix.postConcat(suppMatrix)
         imageMatrix = drawMatrix
     }
@@ -296,5 +345,4 @@ class Zoom05ImageView @kotlin.jvm.JvmOverloads constructor(
         override fun onScaleEnd(detector: ScaleGestureDetector) {
         }
     }
-
 }

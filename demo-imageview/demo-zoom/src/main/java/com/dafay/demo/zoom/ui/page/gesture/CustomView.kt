@@ -17,8 +17,8 @@ class CustomView @kotlin.jvm.JvmOverloads constructor(
     private val scaleGestureDetector: ScaleGestureDetector
 
     init {
-        scaleGestureDetector = ScaleGestureDetector(context,
-            com.dafay.demo.zoom.ui.page.gesture.MyScaleGestureDetector()
+        scaleGestureDetector = ScaleGestureDetector(
+            context, MyScaleGestureDetector()
         )
 
         setOnTouchListener(object : View.OnTouchListener {

@@ -11,7 +11,7 @@ import androidx.viewbinding.ViewBinding
 
 /**
  * @Des
- * @Author lipengfei
+ * @Author dafay
  * @Date 2024/2/20
  */
 abstract class BaseFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayoutId) {

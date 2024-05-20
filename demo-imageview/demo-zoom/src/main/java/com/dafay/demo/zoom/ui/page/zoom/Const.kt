@@ -1,4 +1,4 @@
-package com.dafay.demo.zoom.ui.page.gesture
+package com.dafay.demo.zoom.ui.page.zoom
 
 
 

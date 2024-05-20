@@ -1,4 +1,4 @@
-package com.dafay.demo.zoom.ui.page.gesture
+package com.dafay.demo.zoom.ui.page.zoom
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -9,25 +9,24 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.AttributeSet
+import android.view.Choreographer
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.view.animation.AnimationUtils
+import android.widget.OverScroller
 import androidx.appcompat.widget.AppCompatImageView
-import com.dafay.demo.lib.base.utils.debug
 import com.dafay.demo.zoom.utils.scaleX
-import com.dafay.demo.zoom.utils.toPrint
 import com.dafay.demo.zoom.utils.translateBy
 import com.dafay.demo.zoom.utils.zoomBy
 import com.dafay.demo.zoom.utils.zoomTo
 
 /**
  * 实现功能
- * 1. 初始化处理
- * 问题：
- * 1. 同一张图片的高清、低清切换的问题（图片宽高比一样）,例如执行放大过程中切换
+ * 快速滑动 fling 处理
  */
-class Zoom03ImageView @kotlin.jvm.JvmOverloads constructor(
+class Zoom05ImageView @kotlin.jvm.JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -45,7 +44,15 @@ class Zoom03ImageView @kotlin.jvm.JvmOverloads constructor(
     private var zoomAnim = ValueAnimator().apply { duration = DEFAULT_ANIM_DURATION }
     private val pivotPointF = PointF(0f, 0f)
 
+    // 用来执行 onFling 动画
+    private var overScroller: OverScroller
+    private var startTime: Long = 0
+    private val choreographer = Choreographer.getInstance()
+    private var currentX = 0
+    private var currentY = 0
+
     init {
+        overScroller = OverScroller(context)
         scaleType = ScaleType.MATRIX
         val multiGestureDetector = MultiGestureDetector()
         gestureDetector = GestureDetector(context, multiGestureDetector)
@@ -108,10 +115,10 @@ class Zoom03ImageView @kotlin.jvm.JvmOverloads constructor(
      * 处理双击事件，双击执行缩放动画
      */
     private fun dealOnDoubleTap(e: MotionEvent) {
-        playZoomAnim(e.x,e.y)
+        playZoomAnim(e.x, e.y)
     }
 
-    fun playZoomAnim(pivotX:Float,pivotY:Float){
+    private fun playZoomAnim(pivotX: Float, pivotY: Float) {
         zoomAnim.removeAllUpdateListeners()
         zoomAnim.cancel()
         // 点击的点设置为缩放的中心点
@@ -151,15 +158,111 @@ class Zoom03ImageView @kotlin.jvm.JvmOverloads constructor(
         applyToImageMatrix()
     }
 
+    private fun dealOnFling(e2: MotionEvent, velocityX: Float, velocityY: Float) {
+        val rect = getDrawMatrixRect(imageMatrix) ?: return
+        val startX = Math.round(-rect.left)
+        val minX: Int
+        val maxX: Int
+        val minY: Int
+        val maxY: Int
+        if (width < rect.width()) {
+            minX = 0
+            maxX = Math.round(rect.width() - width)
+        } else {
+            maxX = startX
+            minX = maxX
+        }
+        val startY = Math.round(-rect.top)
+        if (height < rect.height()) {
+            minY = 0
+            maxY = Math.round(rect.height() - height)
+        } else {
+            maxY = startY
+            minY = maxY
+        }
+        currentX = startX
+        currentY = startY
+
+        if (!((startX != maxX) || (startY != maxY))) {
+            return
+        }
+        overScroller.fling(startX, startY, -velocityX.toInt(), -velocityY.toInt(), minX, maxX, minY, maxY, 0, 0)
+        startFlingAnim()
+    }
+
+    private fun startFlingAnim() {
+        startTime = AnimationUtils.currentAnimationTimeMillis()
+        postNextFrame()
+    }
+
+    private fun postNextFrame() {
+        if (overScroller.computeScrollOffset()) {
+            val currX = overScroller.currX
+            val currY = overScroller.currY
+            suppMatrix.translateBy((currentX - currX).toFloat(), (currentY - currY).toFloat())
+            applyToImageMatrix()
+            currentX = currX
+            currentY = currY
+            choreographer.postFrameCallback {
+                postNextFrame()
+            }
+        }
+    }
+
+
+    /**
+     * 在显示之前，进行边界矫正，对 suppMatrix 进行调整
+     */
+    private fun correctSuppMatrix() {
+        // 目标 matrix
+        val tempMatrix = Matrix(originMatrix).apply { postConcat(suppMatrix) }
+        // 得到 matrix 的 rect
+        val tempRectF = getDrawMatrixRect(tempMatrix)
+        tempRectF ?: return
+        var deltaX = 0f
+        var deltaY = 0f
+
+        if (tempRectF.height() < height) {
+            deltaY = ((height - tempRectF.height()) / 2) - tempRectF.top
+        } else if (tempRectF.top > 0) {
+            deltaY = -tempRectF.top
+        } else if (tempRectF.bottom < height) {
+            deltaY = height - tempRectF.bottom
+        }
+
+        if (tempRectF.width() <= width) {
+            deltaX = ((width - tempRectF.width()) / 2) - tempRectF.left
+        } else if (tempRectF.left > 0) {
+            deltaX = -tempRectF.left
+        } else if (tempRectF.right < width) {
+            deltaX = width - tempRectF.right
+        }
+        suppMatrix.translateBy(deltaX, deltaY)
+    }
+
+    private fun getDrawMatrixRect(matrix: Matrix): RectF? {
+        val d = drawable
+        if (null != d) {
+            val tempRect = RectF()
+            // 什么新奇的写法
+            tempRect[0f, 0f, d.intrinsicWidth.toFloat()] = d.intrinsicHeight.toFloat()
+            matrix.mapRect(tempRect)
+            return tempRect
+        }
+        return null
+    }
+
+
     /**
      * 应用于 ImageView 的 matrix，为了思路清晰，这里先频繁创建对象 drawMatrix
      */
-    fun applyToImageMatrix() {
+    private fun applyToImageMatrix() {
+        // 在应用之前，进行边界矫正
+        correctSuppMatrix()
         val drawMatrix = Matrix()
         drawMatrix.set(originMatrix)
         // drawMatrix = suppMatrix * originMatrix
         drawMatrix.postConcat(suppMatrix)
-        debug("originMatrix:${originMatrix} suppMatrix:${suppMatrix} drawMatrix:${drawMatrix}")
         imageMatrix = drawMatrix
     }
 
@@ -176,6 +279,11 @@ class Zoom03ImageView @kotlin.jvm.JvmOverloads constructor(
             return super.onScroll(e1, e2, distanceX, distanceY)
         }
 
+        override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+            dealOnFling(e2, velocityX, velocityY)
+            return super.onFling(e1, e2, velocityX, velocityY)
+        }
+
         override fun onScale(detector: ScaleGestureDetector): Boolean {
             dealOnScale(detector)
             return true
@@ -188,4 +296,5 @@ class Zoom03ImageView @kotlin.jvm.JvmOverloads constructor(
         override fun onScaleEnd(detector: ScaleGestureDetector) {
         }
     }
+
 }

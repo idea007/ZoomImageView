@@ -10,7 +10,4 @@ class CircleLayoutFragment : BaseFragment(R.layout.fragment_circle_layout) {
 
     override val binding: ViewBinding by viewBinding()
 
-
-
-
 }

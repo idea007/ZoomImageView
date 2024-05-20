@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <com.dafay.demo.zoom.ui.page.interpolator.CanvasGridBgView
+    <com.dafay.demo.zoom.ui.page.coord.CanvasGridBgView
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

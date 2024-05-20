@@ -1,4 +1,4 @@
-package com.dafay.demo.zoom.ui.page.gesture
+package com.dafay.demo.zoom.ui.page.zoom
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -17,19 +17,14 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.OverScroller
 import androidx.appcompat.widget.AppCompatImageView
-import com.dafay.demo.lib.base.utils.debug
+import com.dafay.demo.lib.base.utils.ScreenUtils
 import com.dafay.demo.zoom.utils.MathUtils
 import com.dafay.demo.zoom.utils.scaleX
 import com.dafay.demo.zoom.utils.translateBy
 import com.dafay.demo.zoom.utils.zoomBy
 import com.dafay.demo.zoom.utils.zoomTo
 
-/**
- * 实现功能
- * 1. 解决双击缩放到最小过程中，动画过渡不自然的问题（边界矫正太过生硬），
- * 解决思路：缩放动画，起始 matrix 和 终止 matrix 过程中，povit 支点也要随着动画进度做改变
- */
-class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
+class Zoom08ImageView @kotlin.jvm.JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -42,7 +37,11 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
     // 默认类似 fitCenter 显示模式时的矩阵
     private val originMatrix = Matrix()
     private val suppMatrix = Matrix()
+
+    // 绘画前辅助计算用
+    private val tempMatrix = Matrix()
     private var minZoom = DEFAULT_MIN_ZOOM
+    private var midZoom = DEFAULT_MID_ZOOM
     private var maxZoom = DEFAULT_MAX_ZOOM
     private var zoomAnim = ValueAnimator().apply { duration = DEFAULT_ANIM_DURATION }
     private val pivotPointF = PointF(0f, 0f)
@@ -53,6 +52,12 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
     private val choreographer = Choreographer.getInstance()
     private var currentX = 0
     private var currentY = 0
+    private var overMinZoomRadio = 0.75f
+
+    private var scrollEdge = Edge.EDGE_NONE
+    private var allowParentInterceptOnEdge = true
+    private var pointerCount = 0
+    var viewTapListener: OnViewTapListener? = null
 
     init {
         overScroller = OverScroller(context)
@@ -65,7 +70,19 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
                 if (gestureDetector.onTouchEvent(event)) {
                     return true
                 }
-                return scaleGestureDetector.onTouchEvent(event)
+                scaleGestureDetector.onTouchEvent(event)
+                pointerCount = event.pointerCount
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        parent?.requestDisallowInterceptTouchEvent(true)
+                    }
+
+                    MotionEvent.ACTION_UP,
+                    MotionEvent.ACTION_CANCEL -> {
+                        dealUpOrCancel(event)
+                    }
+                }
+                return true
             }
         })
     }
@@ -88,6 +105,34 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
     override fun setImageURI(uri: Uri?) {
         super.setImageURI(uri)
         updateOriginMatrix(drawable)
+    }
+
+    fun setMinZoom(minZoom: Float) {
+        checkZoomLevels(minZoom, midZoom, maxZoom)
+        this.minZoom = minZoom
+    }
+
+    fun setMidZoom(midZoom: Float) {
+        checkZoomLevels(minZoom, midZoom, maxZoom)
+        this.midZoom = midZoom
+    }
+
+    fun setMaxZoom(maxZoom: Float) {
+        checkZoomLevels(minZoom, midZoom, maxZoom)
+        this.maxZoom = maxZoom
+    }
+
+    private fun checkZoomLevels(minZoom: Float, midZoom: Float, maxZoom: Float) {
+        if (minZoom >= midZoom) {
+            throw IllegalArgumentException("MinZoom should be less than MidZoom")
+        } else if (midZoom >= maxZoom) {
+            throw IllegalArgumentException("MidZoom should be less than MaxZoom")
+        }
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val newHeight: Int = ScreenUtils.getFullScreenHeight()
+        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(newHeight, MeasureSpec.EXACTLY))
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -118,21 +163,35 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
      * 处理双击事件，双击执行缩放动画
      */
     private fun dealOnDoubleTap(e: MotionEvent) {
-        playZoomAnim(e.x, e.y)
+        animZoom(e.x, e.y)
     }
 
-    /**
-     * 改变动画实现方式
-     */
-    fun playZoomAnim(pivotX: Float, pivotY: Float) {
+    private fun animZoom(pivotX: Float, pivotY: Float) {
+        val currZoom = suppMatrix.scaleX()
+        val endZoom = if (currZoom < midZoom) {
+            midZoom
+        } else if (currZoom < maxZoom) {
+            maxZoom
+        } else {
+            minZoom
+        }
+        playZoomAnim(currZoom, endZoom, pivotX, pivotY)
+    }
+
+    private fun dealUpOrCancel(event: MotionEvent) {
+        val currZoom = suppMatrix.scaleX()
+        if (currZoom < minZoom) {
+            val rect = getDrawMatrixRect(imageMatrix)
+            rect?.let { playZoomAnim(currZoom, minZoom, it.centerX(), it.centerY()) }
+        }
+    }
+
+    private fun playZoomAnim(startZoom: Float, endZoom: Float, pivotX: Float, pivotY: Float) {
         zoomAnim.removeAllUpdateListeners()
         zoomAnim.cancel()
 
         // 点击的点设置为缩放的支点
         pivotPointF.set(pivotX, pivotY)
-        val startZoom = suppMatrix.scaleX()
-        val endZoom = if (Math.abs(startZoom - maxZoom) > Math.abs(startZoom - minZoom)) maxZoom else minZoom
-
         val startMatrix = Matrix(imageMatrix)
         val endMatrix = Matrix(originMatrix).apply {
             val tempSuppMatrix = Matrix(suppMatrix)
@@ -147,53 +206,33 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
         val tmpPointArr = floatArrayOf(pivotX, pivotY)
         MathUtils.computeNewPosition(tmpPointArr, imageMatrix, endMatrix)
         val endPivotPointF = PointF(tmpPointArr[0], tmpPointArr[1])
-
+        val currMatrix = Matrix()
         val animatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
             override fun onAnimationUpdate(animation: ValueAnimator) {
                 val tempValue = animation.animatedValue as Float
                 val factor = (tempValue - startZoom) / (endZoom - startZoom)
-                debug("playZoomAnim factor=${factor}")
-                val currMatrix = MathUtils.interpolate(
-                    startMatrix,
-                    pivotPointF.x,
-                    pivotPointF.y,
-                    endMatrix,
-                    endPivotPointF.x,
-                    endPivotPointF.y,
-                    factor
+                currMatrix.set(
+                    MathUtils.interpolate(
+                        startMatrix,
+                        pivotPointF.x,
+                        pivotPointF.y,
+                        endMatrix,
+                        endPivotPointF.x,
+                        endPivotPointF.y,
+                        factor
+                    )
                 )
                 // suppMatrix * originMatrix = currMatrix;  suppMatrix = currMatrix *（originMatrix 的逆矩阵）
-                val tmpMatrix = Matrix()
-                originMatrix.invert(tmpMatrix)
-                tmpMatrix.postConcat(currMatrix)
-                suppMatrix.set(tmpMatrix)
+                tempMatrix.reset()
+                originMatrix.invert(tempMatrix)
+                tempMatrix.postConcat(currMatrix)
+                suppMatrix.set(tempMatrix)
                 applyToImageMatrix(true)
             }
         }
         zoomAnim.setFloatValues(startZoom, endZoom)
         zoomAnim.addUpdateListener(animatorUpdateListener)
         zoomAnim.start()
-    }
-
-    /**
-     * 处理拖动（平移）事件
-     */
-    private fun dealOnScroll(distanceX: Float, distanceY: Float) {
-        suppMatrix.translateBy(-distanceX, -distanceY)
-        applyToImageMatrix()
-    }
-
-    /**
-     * 处理双指缩放事件
-     */
-    private fun dealOnScale(detector: ScaleGestureDetector) {
-        val currScale: Float = suppMatrix.scaleX()
-        var scaleFactor = detector.scaleFactor
-        if ((currScale >= maxZoom && scaleFactor > 1f) || (currScale <= minZoom && scaleFactor < 1f)) {
-            return
-        }
-        suppMatrix.zoomBy(scaleFactor, detector.focusX, detector.focusY)
-        applyToImageMatrix()
     }
 
     private fun dealOnFling(e2: MotionEvent, velocityX: Float, velocityY: Float) {
@@ -220,7 +259,6 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
         }
         currentX = startX
         currentY = startY
-
         if (!((startX != maxX) || (startY != maxY))) {
             return
         }
@@ -248,6 +286,34 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
     }
 
     /**
+     * 处理拖动（平移）事件
+     */
+    private fun dealOnScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float) {
+        if (allowParentInterceptOnEdge && !scaleGestureDetector.isInProgress) {
+            if (pointerCount < 2) {
+                if (scrollEdge == Edge.EDGE_BOTH || (scrollEdge == Edge.EDGE_LEFT && -distanceX >= 1f) || (scrollEdge == Edge.EDGE_RIGHT && -distanceX <= -1f)) {
+                    parent?.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+        }
+        suppMatrix.translateBy(-distanceX, -distanceY)
+        applyToImageMatrix()
+    }
+
+    /**
+     * 处理双指缩放
+     */
+    private fun dealOnScale(detector: ScaleGestureDetector) {
+        val currScale: Float = suppMatrix.scaleX()
+        var scaleFactor = detector.scaleFactor
+        if ((currScale >= maxZoom && scaleFactor > 1f) || (currScale <= minZoom * overMinZoomRadio && scaleFactor < 1f)) {
+            return
+        }
+        suppMatrix.zoomBy(scaleFactor, detector.focusX, detector.focusY)
+        applyToImageMatrix()
+    }
+
+    /**
      * 对输入矩阵，依据 View 宽高进行调整，输出需要调整的平移量
      */
     private fun correctByViewBound(srcMatrix: Matrix): PointF {
@@ -266,10 +332,15 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
         }
         if (tempRectF.width() <= width) {
             deltaX = ((width - tempRectF.width()) / 2) - tempRectF.left
+            scrollEdge = Edge.EDGE_BOTH
         } else if (tempRectF.left > 0) {
             deltaX = -tempRectF.left
+            scrollEdge = Edge.EDGE_LEFT
         } else if (tempRectF.right < width) {
             deltaX = width - tempRectF.right
+            scrollEdge = Edge.EDGE_RIGHT
+        } else {
+            scrollEdge = Edge.EDGE_NONE
         }
         tempPointF.set(deltaX, deltaY)
         return tempPointF
@@ -281,20 +352,20 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
             val tempRect = RectF()
             // 新奇的写法
             tempRect[0f, 0f, d.intrinsicWidth.toFloat()] = d.intrinsicHeight.toFloat()
-            debug("getDrawMatrixRect tempRect=${tempRect}")
             matrix.mapRect(tempRect)
-            debug("getDrawMatrixRect tempRect=${tempRect}")
             return tempRect
         }
         return null
     }
+
 
     /**
      * 在显示之前，进行边界矫正，对 suppMatrix 进行调整
      */
     private fun correctSuppMatrix() {
         // 目标 matrix
-        val tempMatrix = Matrix(originMatrix).apply { postConcat(suppMatrix) }
+        tempMatrix.set(originMatrix)
+        tempMatrix.postConcat(suppMatrix)
         correctByViewBound(tempMatrix).let {
             suppMatrix.translateBy(it.x, it.y)
         }
@@ -308,15 +379,24 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
             // 在应用之前，进行边界矫正
             correctSuppMatrix()
         }
-        val drawMatrix = Matrix()
-        drawMatrix.set(originMatrix)
+        tempMatrix.set(originMatrix)
         // 即当前 Matrix 会乘以传入的 Matrix。 suppMatrix*originMatrix
-        drawMatrix.postConcat(suppMatrix)
-        imageMatrix = drawMatrix
+        tempMatrix.postConcat(suppMatrix)
+        imageMatrix = tempMatrix
     }
 
     inner class MultiGestureDetector : GestureDetector.SimpleOnGestureListener(),
         ScaleGestureDetector.OnScaleGestureListener {
+
+        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            viewTapListener?.onViewTap(this@Zoom08ImageView, e.x, e.y)
+            return super.onSingleTapConfirmed(e)
+        }
+
+        override fun onLongPress(e: MotionEvent) {
+            super.onLongPress(e)
+            viewTapListener?.onLongClick(this@Zoom08ImageView)
+        }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
             dealOnDoubleTap(e)
@@ -324,7 +404,9 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
         }
 
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-            dealOnScroll(distanceX, distanceY)
+            e1?.let {
+                dealOnScroll(e1, e2, distanceX, distanceY)
+            }
             return super.onScroll(e1, e2, distanceX, distanceY)
         }
 
@@ -344,5 +426,10 @@ class Zoom06ImageView @kotlin.jvm.JvmOverloads constructor(
 
         override fun onScaleEnd(detector: ScaleGestureDetector) {
         }
+    }
+
+    interface OnViewTapListener {
+        fun onViewTap(view: View?, x: Float, y: Float)
+        fun onLongClick(view: View?)
     }
 }

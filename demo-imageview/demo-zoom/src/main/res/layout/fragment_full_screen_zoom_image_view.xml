@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.page.gesture.FullScreenZoomImageViewFragment">
+    tools:context=".ui.page.zoom.ZoomImageViewFullScreenFragment">
 
-    <com.dafay.demo.zoom.ui.page.gesture.Zoom07ImageView
+    <com.dafay.demo.zoom.ui.page.zoom.Zoom08ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#30ff00ff"

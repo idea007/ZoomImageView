@@ -10,7 +10,7 @@ import java.security.AccessController.getContext
 /**
  * @ClassName ScreenUtils
  * @Des https://stackoverflow.com/questions/4743116/get-screen-width-and-height-in-android
- * @Author lipengfei
+ * @Author dafay
  * @Date 2023/9/11 09:13
  */
 object ScreenUtils {

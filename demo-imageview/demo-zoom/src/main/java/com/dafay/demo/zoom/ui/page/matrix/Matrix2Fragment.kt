@@ -1,17 +1,10 @@
 package com.dafay.demo.zoom.ui.page.matrix
 
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.RadioGroup
 import android.widget.RadioGroup.OnCheckedChangeListener
-import androidx.viewbinding.ViewBinding
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.dafay.demo.lib.base.ui.base.BaseFragment
 import com.dafay.demo.zoom.R
-import com.dafay.demo.zoom.databinding.FragmentMatrix1Binding
 import com.dafay.demo.zoom.databinding.FragmentMatrix2Binding
 
 

@@ -34,6 +34,10 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    sourceSets {
+        main.res.srcDirs += 'src/main/res-img'
+    }
 }
 
 dependencies {

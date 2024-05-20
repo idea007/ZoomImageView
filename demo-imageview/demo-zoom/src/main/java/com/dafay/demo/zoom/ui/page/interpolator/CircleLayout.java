@@ -35,7 +35,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 
-
 import com.dafay.demo.zoom.R;
 
 import java.security.InvalidParameterException;
@@ -47,7 +46,7 @@ import java.security.InvalidParameterException;
  */
 public class CircleLayout extends ViewGroup {
 
-    private final String TAG=CircleLayout.class.getName();
+    private final String TAG = CircleLayout.class.getName();
 
     public enum FirstChildPosition {
         EAST(0), SOUTH(90), WEST(180), NORTH(270);
@@ -142,8 +141,8 @@ public class CircleLayout extends ViewGroup {
                 }
             }
 
-            int colorId=a.getResourceId(R.styleable.CircleLayout_bgColor, Color.TRANSPARENT);
-            mBgColor=a.getResources().getInteger(colorId);
+            int colorId = a.getResourceId(R.styleable.CircleLayout_bgColor, Color.TRANSPARENT);
+            mBgColor = a.getResources().getInteger(colorId);
 
             a.recycle();
 
@@ -347,10 +346,10 @@ public class CircleLayout extends ViewGroup {
 
     private void initRegion() {
 
-        int offset=cWidth*4/5;
+        int offset = cWidth * 4 / 5;
 
-        RectF bigCircle = new RectF(getWidth() / 2 - radius - offset , getHeight() / 2 - radius - offset , getWidth() / 2 + radius + offset , getHeight() / 2 + radius + offset );
-        RectF smallCircle = new RectF(getWidth() / 2 - radius + offset , getHeight() / 2 - radius + offset , getWidth() / 2 + radius - offset , getHeight() / 2 + radius - offset );
+        RectF bigCircle = new RectF(getWidth() / 2 - radius - offset, getHeight() / 2 - radius - offset, getWidth() / 2 + radius + offset, getHeight() / 2 + radius + offset);
+        RectF smallCircle = new RectF(getWidth() / 2 - radius + offset, getHeight() / 2 - radius + offset, getWidth() / 2 + radius - offset, getHeight() / 2 + radius - offset);
 
         ring = new Path();
         ring.addArc(bigCircle, 0, 359.9f);
@@ -364,25 +363,15 @@ public class CircleLayout extends ViewGroup {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
-//        paint.setColor(getResources().getColor(R.color.black));
-//        paint.setColor(Color.parseColor("#412f37"));
         paint.setColor(mBgColor);
-//        canvas.drawCircle(getWidth()/2,getHeight()/2,radius+cWidth/2,paint);
-//        canvas.drawCircle(getWidth()/2,getHeight()/2,radius-cWidth/2,paint);
-
-
-//        canvas.drawPath(ring, paint);
-//        paint.setColor(getResources().getColor(R.color.c_888888));
-        canvas.drawCircle(getWidth()/2,getHeight()/2,radius+cWidth*4/5,paint);
-
+        canvas.drawCircle(getWidth() / 2, getHeight() / 2, radius + cWidth * 4 / 5, paint);
     }
 
 
-    public void rotateViewToCenter(View view){
-        rotateViewToCenter(view,false);
+    public void rotateViewToCenter(View view) {
+        rotateViewToCenter(view, false);
     }
 
     /**
@@ -390,7 +379,7 @@ public class CircleLayout extends ViewGroup {
      *
      * @param view the view to be rotated
      */
-    public void rotateViewToCenter(View view,boolean isActionUp) {
+    public void rotateViewToCenter(View view, boolean isActionUp) {
         if (isRotating) {
             float viewAngle = view.getTag() != null ? (Float) view.getTag() : 0;
             float destAngle = firstChildPosition.getAngle() - viewAngle;
@@ -398,18 +387,14 @@ public class CircleLayout extends ViewGroup {
             if (destAngle < 0) {
                 destAngle += 360;
             }
-
             if (destAngle > 180) {
                 destAngle = -1 * (360 - destAngle);
             }
-
-            Log.w("CircleLayout","---- destAngle="+destAngle+" isActionUp="+isActionUp+" speed="+speed);
-            if(isActionUp){
+            if (isActionUp) {
                 animateTo(angle + destAngle, 2500L / speed);
-            }else{
+            } else {
                 animateTo(angle + destAngle, 7500L / speed);
             }
-
         }
     }
 
@@ -443,7 +428,6 @@ public class CircleLayout extends ViewGroup {
                 cWidth = childWidth;
             }
 
-
             left = Math
                     .round((float) (((circleWidth / 2.0) - childWidth / 2.0) + radius
                             * Math.cos(Math.toRadians(localAngle))));
@@ -452,7 +436,6 @@ public class CircleLayout extends ViewGroup {
                             * Math.sin(Math.toRadians(localAngle))));
 
             child.setTag(localAngle);
-
             float distance = Math.abs(localAngle - firstChildPosition.getAngle());
             boolean isFirstItem = distance <= halfAngle || distance >= (360 - halfAngle);
             if (isFirstItem && selectedView != child) {
@@ -461,7 +444,6 @@ public class CircleLayout extends ViewGroup {
                     onItemSelectedListener.onItemSelected(child);
                 }
             }
-
             child.layout(left, top, left + childWidth, top + childHeight);
             localAngle += angleDelay;
         }
@@ -471,7 +453,6 @@ public class CircleLayout extends ViewGroup {
         if (animator != null && animator.isRunning() || Math.abs(angle - endDegree) < 1) {
             return;
         }
-
         animator = ObjectAnimator.ofFloat(CircleLayout.this, "angle", angle, endDegree);
         animator.setDuration(duration);
         animator.setInterpolator(new DecelerateInterpolator());
@@ -546,33 +527,27 @@ public class CircleLayout extends ViewGroup {
     }
 
 
-    private float onTouchDownRawX,onTouchDownRawY;
+    private float onTouchDownRawX, onTouchDownRawY;
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
 
         if (isEnabled()) {
-            if (ringRegion.contains((int) event.getX(), (int) event.getY())||didMove) {
-
-
-
-                Log.w("CircleLayout","---- event.getRawX"+event.getRawX()+" ----event.getRawY"+event.getRawY());
+            if (ringRegion.contains((int) event.getX(), (int) event.getY()) || didMove) {
+                Log.w("CircleLayout", "---- event.getRawX" + event.getRawX() + " ----event.getRawY" + event.getRawY());
                 gestureDetector.onTouchEvent(event);
                 if (isRotating) {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
-
-                            onTouchDownRawX=event.getRawX();
-                            onTouchDownRawY=event.getRawY();
-
-                            if(onTouthDownListener!=null){
-                                onTouthDownListener.onTouchDown(event.getRawX(),event.getRawY());
+                            onTouchDownRawX = event.getRawX();
+                            onTouchDownRawY = event.getRawY();
+                            if (onTouthDownListener != null) {
+                                onTouthDownListener.onTouchDown(event.getRawX(), event.getRawY());
                             }
-
                             // reset the touched quadrants
                             for (int i = 0; i < quadrantTouched.length; i++) {
                                 quadrantTouched[i] = false;
                             }
-
                             stopAnimation();
                             touchStartAngle = getPositionAngle(event.getX(),
                                     event.getY());
@@ -587,7 +562,7 @@ public class CircleLayout extends ViewGroup {
                             break;
                         case MotionEvent.ACTION_UP:
                             if (didMove) {
-                                rotateViewToCenter(selectedView,true);
+                                rotateViewToCenter(selectedView, true);
                             }
                             break;
                         default:
@@ -599,7 +574,7 @@ public class CircleLayout extends ViewGroup {
                         - (circleWidth / 2), circleHeight - event.getY()
                         - (circleHeight / 2))] = true;
                 return super.dispatchTouchEvent(event);
-            }else{
+            } else {
                 return false;
             }
         }
@@ -698,12 +673,12 @@ public class CircleLayout extends ViewGroup {
             if (tappedView != null) {
                 if (selectedView == tappedView) {
                     if (onItemClickListener != null) {
-                        onItemClickListener.onItemClick(tappedView,onTouchDownRawX,onTouchDownRawY);
+                        onItemClickListener.onItemClick(tappedView, onTouchDownRawX, onTouchDownRawY);
                     }
                 } else {
 
                     if (onItemClickListener != null) {
-                        onItemClickListener.onItemClick(tappedView,onTouchDownRawX,onTouchDownRawY);
+                        onItemClickListener.onItemClick(tappedView, onTouchDownRawX, onTouchDownRawY);
                     }
 
                     rotateViewToCenter(tappedView);
@@ -732,7 +707,7 @@ public class CircleLayout extends ViewGroup {
     }
 
     public interface OnItemClickListener {
-        void onItemClick(View view,float onTouchDownRawX,float onTouchDownRawY);
+        void onItemClick(View view, float onTouchDownRawX, float onTouchDownRawY);
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -768,7 +743,7 @@ public class CircleLayout extends ViewGroup {
 
 
     public interface OnTouthDownListener {
-        void onTouchDown(float x,float y);
+        void onTouchDown(float x, float y);
     }
 
     public void setOnTouthDownListener(OnTouthDownListener onTouthDownListener) {

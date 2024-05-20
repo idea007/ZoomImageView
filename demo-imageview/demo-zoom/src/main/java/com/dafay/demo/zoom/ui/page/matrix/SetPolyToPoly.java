@@ -43,7 +43,7 @@ public class SetPolyToPoly extends View {
 
     private void initBitmapAndMatrix() {
         mBitmap = BitmapFactory.decodeResource(getResources(),
-                R.mipmap.img_3);
+                R.mipmap.img_01);
 
         float[] temp = {0, 0,                                    // 左上
                 mBitmap.getWidth()/2, 0,                          // 右上
